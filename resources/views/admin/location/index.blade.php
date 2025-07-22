@@ -5,12 +5,10 @@
             <a href="#"><span class="text-muted fw-light">{{ __('Dashboards') }} /</span>
             </a>
             <a href="#" class="text-secondary">
-                {{ __('Master User') }} /</a> {{ __('Detail') }}
+                {{ __('Master Location') }} /</a>
         </h4>
         <div class="row">
-            <h1>Data Dahboard</h1>
-            <pre>{{ json_encode(Auth::user(), JSON_PRETTY_PRINT) }}</pre>
-
+            <h1>Data Location</h1>
         </div>
     </div>
 @endsection

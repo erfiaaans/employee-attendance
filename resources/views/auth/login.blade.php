@@ -6,7 +6,7 @@
         <!-- Left Image -->
         <div class="col-md-6 d-none d-md-block">
             <img
-                src="{{ asset('assets/img/logo-login.jpg') }}"
+                src="{{ asset('img/logo-login.jpg') }}"
                 alt="Welcome"
                 class="img-fluid h-100 w-100"
                 style="object-fit: cover;"
