@@ -16,11 +16,7 @@
         <!-- Right Login Form -->
         <div class="col-md-6 d-flex align-items-center justify-content-center px-4">
             <div style="width: 100%; max-width: 450px;">
-                <div class="text-center mb-4">
-                    <!-- Logo SVG -->
-                    <svg width="40" viewBox="0 0 25 42" xmlns="http://www.w3.org/2000/svg" fill="currentColor">
-                        <path d="M13.79,0.36 L3.4,7.44..." />
-                    </svg>
+                <div class="text-center mb-4">Employee Attendance
                 </div>
 
                 <h2 class="mb-1 text-center">Welcome Back 👋</h2>
@@ -37,7 +33,7 @@
                             id="email"
                             name="email"
                             value="{{ old('email') }}"
-                            required
+
                             autofocus
                             placeholder="Enter your email or username"
                         />
@@ -56,7 +52,7 @@
                                 class="form-control @error('password') is-invalid @enderror"
                                 id="password"
                                 name="password"
-                                required
+
                                 placeholder="************"
                             />
                             <span class="input-group-text">
