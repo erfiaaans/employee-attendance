@@ -31,12 +31,12 @@
                                     <thead class="table-light">
                                         <th style="width: 20px;">#</th>
                                         <th>Nama</th>
-                                        <th style="width: 200px;">Alamat</th>
+                                        <th>Alamat</th>
                                         <th>Kota</th>
                                         <th>Latitude</th>
                                         <th>Longitude</th>
                                         <th style="width: 50px;">Radius</th>
-                                        <th>Aksi</th>
+                                        <th style="width: 110px;">Aksi</th>
                                     </thead>
                                     <tbody class="table-border-bottom-0">
                                         @forelse ($locations as $index => $location)
