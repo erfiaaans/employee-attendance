@@ -17,6 +17,8 @@
 
     <link rel="stylesheet" href="{{ asset('/vendor/fonts/iconify-icons.css') }}" />
     <link rel="stylesheet" href="{{ asset('/vendor/css/core.css') }}" />
+    <link rel="stylesheet" href="{{ asset('/vendor/libs/toastr/toastr.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('/vendor/libs/sweetalert2-theme-bootstrap-4/bootstrap-4.min.css') }}">
     <link rel="stylesheet" href="{{ asset('/css/demo.css') }}" />
     <link rel="stylesheet" href="{{ asset('/vendor/libs/perfect-scrollbar/perfect-scrollbar.css') }}" />
     <script src="{{ asset('/vendor/js/helpers.js') }}"></script>
@@ -243,9 +245,59 @@
     <script src="{{ asset('/vendor/js/bootstrap.js') }}"></script>
 
     <script src="{{ asset('/vendor/libs/perfect-scrollbar/perfect-scrollbar.js') }}"></script>
+    <script src="{{ asset('/vendor/libs/toastr/toastr.min.js') }}"></script>
 
     <script src="{{ asset('/vendor/js/menu.js') }}"></script>
     <script src="{{ asset('/js/main.js') }}"></script>
+    <script src="{{ asset('/vendor/libs/sweetalert2/sweetalert2.min.js') }}"></script>
+
+
+    <script>
+        function showNotif(status, message) {
+            toastr.options = {
+                "closeButton": true,
+                "debug": false,
+                "newestOnTop": true,
+                "progressBar": true,
+                "positionClass": "toast-top-right",
+                "preventDuplicates": true,
+                "onclick": null,
+                "showDuration": "300",
+                "hideDuration": "1000",
+                "timeOut": "5000",
+                "extendedTimeOut": "1000",
+                "showEasing": "swing",
+                "hideEasing": "linear",
+                "showMethod": "fadeIn",
+                "hideMethod": "fadeOut"
+            }
+            toastr[status](message);
+        };
+        @if (session('success'))
+            $(document).ready(showNotif('success', '{{ session('success') }}'));
+        @endif
+        @if (session('error'))
+            $(document).ready(showNotif('error', '{{ session('error') }}'));
+        @endif
+
+        $('.swalDeleteData').click(function(event) {
+            var form = $(this).closest("form");
+            event.preventDefault();
+            Swal.fire({
+                title: ' Menghapus Data!',
+                text: "Apakah anda yakin ingin menghapus data ini ?",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Ya, Hapus!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    form.submit();
+                }
+            })
+        });
+    </script>
     @yield('js')
     {{-- <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script> --}}
 
