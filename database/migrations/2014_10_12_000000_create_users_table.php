@@ -11,8 +11,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('users', function (Blueprint $table) {
-            $table->string('user_id', 20)->primary();
-            $table->string('location_id', 20)->nullable();
+            $table->string('user_id', 36)->primary();
+            $table->string('location_id', 36)->nullable();
             $table->foreign('location_id')->references('location_id')->on('locations')->onDelete('set null');
 
             $table->string('name', 100);
@@ -22,10 +22,10 @@ return new class extends Migration
             $table->timestamp('email_verified_at')->nullable();
             $table->enum('gender', UserGender::values())->nullable();
             $table->string('telephone', 15)->nullable();
-            $table->string('created_by', 20)->nullable();
-            $table->string('updated_by', 20)->nullable();
-            $table->string('created_at', 20)->nullable();
-            $table->string('updated_at', 20)->nullable();
+            $table->string('created_by', 36)->nullable();
+            $table->string('updated_by', 36)->nullable();
+            $table->string('created_at', 36)->nullable();
+            $table->string('updated_at', 36)->nullable();
             $table->string('password', 255);
             $table->string('position', 100)->nullable();
             // $table->string('remember_token', 100)->nullable();

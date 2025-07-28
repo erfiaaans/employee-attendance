@@ -59,7 +59,7 @@
                                         <th>Telepon</th>
                                         <th>Email</th>
                                         <th>Foto</th>
-                                        <th>Aksi</th>
+                                        <th style="width: 110px;">Aksi</th>
                                     </tr>
                                 </thead>
                                 <tbody>

@@ -24,6 +24,7 @@ class Attendance extends Model
         'clock_out_latitude',
         'clock_out_longitude',
         'clock_out_photo_url',
+        'status',
         'created_by',
         'updated_by',
         'created_at',
