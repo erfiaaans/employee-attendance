@@ -9,6 +9,8 @@ use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use App\Enums\UserGender;
 use App\Enums\UserRole;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class User extends Authenticatable
 {
@@ -19,11 +21,11 @@ class User extends Authenticatable
      *
      * @var array<int, string>
      */
+    protected $table = 'users';
     protected $primaryKey = 'user_id';
     public $incrementing = false;
     protected $keyType = 'string';
     protected $fillable = [
-        'user_id',
         'location_id',
         'name',
         'email',
@@ -32,7 +34,6 @@ class User extends Authenticatable
         'gender',
         'position',
         'telephone',
-        'city',
         'created_by',
         'updated_by',
         'password',
@@ -64,8 +65,23 @@ class User extends Authenticatable
     {
         return $this->belongsTo(User::class, 'created_by', 'user_id');
     }
+    public function location(): BelongsTo
+    {
+        return $this->belongsTo(Location::class, 'location_id', 'location_id')->withDefault();
+    }
+    public function setLocationIdAttribute($value)
+    {
+        if (!Location::where('location_id', $value)->exist()) {
+            throw new \InvalidArgumentException("Invalid location_id");
+        }
+        $this->attributes['location_id'] = $value;
+    }
     public function updater()
     {
         return $this->belongsTo(User::class, 'updated_by', 'user_id');
+    }
+    public function getOfficeNameAttribute()
+    {
+        return $this->location ? $this->location->office_name : null;
     }
 }

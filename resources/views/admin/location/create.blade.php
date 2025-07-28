@@ -1,5 +1,3 @@
-{{-- Form Tambah / Edit Kantor --}}
-
 <div class="row">
     <div class="col-md-12">
         <div class="card mb-4">
@@ -13,9 +11,7 @@
                     @if (isset($editLocation))
                         @method('PUT')
                     @endif
-
                     <div class="row g-3">
-                        {{-- Nama Kantor --}}
                         <div class="col-md-4">
                             <label class="form-label">Nama Kantor</label>
                             <input type="text" name="office_name"
@@ -27,8 +23,6 @@
                                 </span>
                             @enderror
                         </div>
-
-                        {{-- Alamat --}}
                         <div class="col-md-4">
                             <label class="form-label">Alamat</label>
                             <input type="text" name="address"
@@ -40,8 +34,6 @@
                                 </span>
                             @enderror
                         </div>
-
-                        {{-- Kota --}}
                         <div class="col-md-4">
                             <label class="form-label">Kota</label>
                             <input type="text" name="city"
@@ -53,8 +45,6 @@
                                 </span>
                             @enderror
                         </div>
-
-                        {{-- Latitude --}}
                         <div class="col-md-4">
                             <label class="form-label">Latitude</label>
                             <input type="text" name="latitude"
@@ -66,8 +56,6 @@
                                 </span>
                             @enderror
                         </div>
-
-                        {{-- Longitude --}}
                         <div class="col-md-4">
                             <label class="form-label">Longitude</label>
                             <input type="text" name="longitude"
@@ -79,8 +67,6 @@
                                 </span>
                             @enderror
                         </div>
-
-                        {{-- Radius --}}
                         <div class="col-md-4">
                             <label class="form-label">Radius (meter)</label>
                             <input type="number" name="radius"
@@ -92,8 +78,11 @@
                                 </span>
                             @enderror
                         </div>
+                        <div class="col-md-12">
+                            <label class="form-label">Pilih Lokasi di Map</label>
+                            <div id="map" style="height: 400px;"></div>
+                        </div>
                     </div>
-
                     <div class="mt-3">
                         <button type="submit" class="btn btn-sm btn-primary">
                             {{ isset($editLocation) ? 'Update' : 'Simpan' }}

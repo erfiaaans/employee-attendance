@@ -12,17 +12,16 @@ return new class extends Migration
     {
         Schema::create('users', function (Blueprint $table) {
             $table->string('user_id', 20)->primary();
-            // $table->string('location_id')->nullable();
-            // $table->foreign('location_id')->references('location_id')->on('locations')->onDelete('set null');
+            $table->string('location_id', 20)->nullable();
+            $table->foreign('location_id')->references('location_id')->on('locations')->onDelete('set null');
 
             $table->string('name', 100);
             $table->enum('role', UserRole::values())->default('employee');
-            $table->text('profile_picture_url')->nullable();
+            $table->string('profile_picture_url', 255)->nullable();
             $table->string('email', 100)->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->enum('gender', UserGender::values())->nullable();
             $table->string('telephone', 15)->nullable();
-            $table->string('city', 100)->nullable();
             $table->string('created_by', 20)->nullable();
             $table->string('updated_by', 20)->nullable();
             $table->string('created_at', 20)->nullable();
@@ -37,11 +36,6 @@ return new class extends Migration
     {
         Schema::table('users', function (Blueprint $table) {
             $table->dropForeign(['location_id']);
-            $table->dropColumn([
-                'user_id', 'name', 'role', 'profile-picture_url', 'email',
-                'email_verified_at', 'gender', 'position', 'telephone', 'city',
-                'password', 'created_by', 'updated_by', 'created_at', 'updated_at', 'location_id'
-            ]);
         });
     }
 };

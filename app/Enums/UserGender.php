@@ -1,10 +1,11 @@
 <?php
 
 namespace App\Enums;
+
 enum UserGender: string
 {
-    case MALE = 'male';
-    case FEMALE = 'female';
+    case Male = 'Laki-laki';
+    case Female = 'Perempuan';
 
     public static function values(): array
     {

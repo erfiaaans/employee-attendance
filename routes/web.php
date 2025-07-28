@@ -1,10 +1,13 @@
 <?php
 
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Employee\EmployeeController;
 use App\Http\Controllers\LocationController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\UserController;
+use App\Models\Attendance;
 
 Route::get('/', [LoginController::class, 'showLoginForm'])->name('index');
 
@@ -20,6 +23,13 @@ Route::group(['namespace' => '', 'prefix' => 'admin',  'middleware' => ['auth', 
     Route::post('locations', [LocationController::class, 'store'])->name('admin.location.store');
     Route::put('locations/{id}', [LocationController::class, 'update'])->name('admin.location.update');
     Route::delete('locations/{id}', [LocationController::class, 'destroy'])->name('admin.location.destroy');
+    Route::get('user', [UserController::class, 'index'])->name('admin.user');
+    Route::post('user', [UserController::class, 'store'])->name('admin.user.store');
+    Route::delete('user/{id}', [UserController::class, 'destroy'])->name('admin.user.destroy');
+    Route::put('user/{id} ', [UserController::class, 'update'])->name('admin.user.update');
+    Route::get('user/{id}', [UserController::class, 'index'])->name('admin.user.edit');
+    Route::get('attendance', [AttendanceController::class, 'index'])->name('admin.attendance');
+    Route::get('profile', [UserController::class, 'profile'])->name('admin.profile');
 });
 
 

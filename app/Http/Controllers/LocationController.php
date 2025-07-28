@@ -16,9 +16,9 @@ class LocationController extends Controller
                 ->orWhere('address', 'like', "%{$search}%")
                 ->orWhere('city', 'like', "%{$search}%");
         })
-            ->orderBy('office_name') // optional: bisa sorting
+            ->orderBy('office_name')
             ->paginate(10)
-            ->appends(['search' => $search]); // penting agar query search tetap di pagination
+            ->appends(['search' => $search]);
 
         $editLocation = null;
         if ($id) {
@@ -27,8 +27,6 @@ class LocationController extends Controller
 
         return view('admin.location.index', compact('locations', 'editLocation'));
     }
-
-
     public function store(Request $request)
     {
         try {
@@ -57,8 +55,6 @@ class LocationController extends Controller
             return redirect()->back()->with('error', 'Terjadi kesalahan saat menyimpan data. Pastikan semua data diisi dengan benar.');
         }
     }
-
-
     public function update(Request $request, $id)
     {
         try {
@@ -83,7 +79,6 @@ class LocationController extends Controller
     {
         $location = Location::findOrFail($id);
         $location->delete();
-
         return redirect()->back()->with('success', 'Lokasi berhasil dihapus.');
     }
 }

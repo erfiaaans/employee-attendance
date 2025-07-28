@@ -14,7 +14,6 @@
     <link
         href="https://fonts.googleapis.com/css2?family=Public+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&display=swap"
         rel="stylesheet" />
-
     <link rel="stylesheet" href="{{ asset('/vendor/fonts/iconify-icons.css') }}" />
     <link rel="stylesheet" href="{{ asset('/vendor/css/core.css') }}" />
     <link rel="stylesheet" href="{{ asset('/vendor/libs/toastr/toastr.min.css') }}">
@@ -101,9 +100,15 @@
                         </a>
                     </li>
                     <li class="menu-item">
-                        <a href="icons-boxicons.html" class="menu-link">
+                        <a href="{{ route('admin.user') }}" class="menu-link">
                             <i class="menu-icon tf-icons bx bx-crown"></i>
                             <div class="text-truncate" data-i18n="Daftar-Pegawai">Daftar Pegawai</div>
+                        </a>
+                    </li>
+                    <li class="menu-item">
+                        <a href="{{ route('admin.attendance') }}" class="menu-link">
+                            <i class="menu-icon tf-icons bx bx-crown"></i>
+                            <div class="text-truncate" data-i18n="Daftar-Pegawai">Riwayat Absensi</div>
                         </a>
                     </li>
                 </ul>
@@ -158,7 +163,7 @@
                                         <div class="dropdown-divider my-1"></div>
                                     </li>
                                     <li>
-                                        <a class="dropdown-item" href="#">
+                                        <a class="dropdown-item" href="{{ route('admin.profile') }}">
                                             <i class="icon-base bx bx-user icon-md me-3"></i><span>My Profile</span>
                                         </a>
                                     </li>
@@ -194,21 +199,13 @@
                                     </li>
                                 </ul>
                             </li>
-                            <!--/ User -->
                         </ul>
                     </div>
                 </nav>
-
-                <!-- / Navbar -->
-
-                <!-- Content wrapper -->
                 <div class="content-wrapper">
-                    <!-- Content -->
                     <div class="container-fluid flex-grow-1 container-p-y">
                         @yield('content')
                     </div>
-                    <!-- / Content -->
-
                     <footer class="content-footer footer bg-footer-theme text-center"
                         style="background: linear-gradient(90deg, #00c6ff, #0072ff);">
                         <div class="container-fluid">
@@ -228,30 +225,18 @@
 
                     <div class="content-backdrop fade"></div>
                 </div>
-                <!-- Content wrapper -->
             </div>
-            <!-- / Layout page -->
         </div>
-
-        <!-- Overlay -->
         <div class="layout-overlay layout-menu-toggle"></div>
     </div>
-
-
-
     <script src="{{ asset('/vendor/libs/jquery/jquery.js') }}"></script>
-
     <script src="{{ asset('/vendor/libs/popper/popper.js') }}"></script>
     <script src="{{ asset('/vendor/js/bootstrap.js') }}"></script>
-
     <script src="{{ asset('/vendor/libs/perfect-scrollbar/perfect-scrollbar.js') }}"></script>
     <script src="{{ asset('/vendor/libs/toastr/toastr.min.js') }}"></script>
-
     <script src="{{ asset('/vendor/js/menu.js') }}"></script>
     <script src="{{ asset('/js/main.js') }}"></script>
     <script src="{{ asset('/vendor/libs/sweetalert2/sweetalert2.min.js') }}"></script>
-
-
     <script>
         function showNotif(status, message) {
             toastr.options = {
@@ -300,7 +285,6 @@
     </script>
     @yield('js')
     {{-- <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script> --}}
-
 </body>
 
 </html>
