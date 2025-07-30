@@ -21,7 +21,6 @@ class UserController extends Controller
             ->orderBy('name')
             ->paginate(10)
             ->appends(['search' => $search]);
-
         $allUsers = User::all();
         $editUser = null;
         if ($id) {
@@ -29,11 +28,7 @@ class UserController extends Controller
         }
         return view('admin.user.index', compact('users', 'editUser', 'allUsers'));
     }
-    public function profile()
-    {
-        $user = auth()->user();
-        return view('admin.profile.index', compact('user'));
-    }
+
     public function store(Request $request)
     {
         try {
@@ -48,7 +43,6 @@ class UserController extends Controller
                 'telephone' => 'nullable|string|max:15|regex:/^[0-9]+$/',
                 'password' => 'required'
             ]);
-
             $user = new user();
             $user->user_id = uniqid();
             $user->name = $validated['name'];
@@ -65,7 +59,6 @@ class UserController extends Controller
         } catch (\Illuminate\Validation\ValidationException $e) {
             throw $e;
         } catch (\Exception $e) {
-            // dd($e);
             return redirect()->back()->with('error', 'Terjadi kesalahan saat menyimpan data. Pastikan semua data diisi dengan benar.');
         }
     }
@@ -80,21 +73,15 @@ class UserController extends Controller
                 'gender' => 'required|in:' . implode(',', UserGender::values()),
                 'profile_picture_url' => 'nullable|url|max:255',
                 'telephone' => 'nullable|string|max:15|regex:/^[0-9]+$/',
-                'password' => 'nullable|string|min:6', // Tidak wajib
+                'password' => 'nullable|string|min:6',
             ]);
-
             $user = User::findOrFail($id);
-
-            // Jika password tidak dikirim, hapus dari array agar tidak diupdate
             if (empty($validated['password'])) {
                 unset($validated['password']);
             } else {
-                // Enkripsi password baru
                 $validated['password'] = bcrypt($validated['password']);
             }
-
             $user->update($validated);
-
             return redirect()->route('admin.user')->with('success', 'Data Pegawai berhasil diperbarui.');
         } catch (\Illuminate\Validation\ValidationException $e) {
             throw $e;
@@ -102,17 +89,10 @@ class UserController extends Controller
             return redirect()->back()->with('error', 'Terjadi kesalahan saat menyimpan data. Pastikan semua data diisi dengan benar.');
         }
     }
-
     public function destroy($id)
     {
         $user = User::findOrFail($id);
         $user->delete();
         return redirect()->back()->with('success', 'Pegawai berhasil dihapus.');
-    }
-
-    public function create()
-    {
-        $users = User::all();
-        return view('admin.user.create', compact('users'));
     }
 }

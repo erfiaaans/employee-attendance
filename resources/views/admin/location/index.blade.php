@@ -110,7 +110,7 @@
     </div>
 @endsection
 
-@section('js')
+@section('scripts')
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
         var defaultLat = {{ old('latitude', $editLocation->latitude ?? -7.250445) }};

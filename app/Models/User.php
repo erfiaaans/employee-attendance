@@ -11,6 +11,7 @@ use App\Enums\UserGender;
 use App\Enums\UserRole;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Facades\Storage;
 
 class User extends Authenticatable
 {
@@ -83,5 +84,13 @@ class User extends Authenticatable
     public function getOfficeNameAttribute()
     {
         return $this->location ? $this->location->office_name : null;
+    }
+
+    public function getPhotoUrlAttribute(): string
+    {
+        if ($this->profile_picture_url && Storage::disk('public')->exists($this->profile_picture_url)) {
+            return asset('storage/' . $this->profile_picture_url);
+        }
+        return asset('img/icons/user.png');
     }
 }

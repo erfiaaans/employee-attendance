@@ -138,7 +138,7 @@
                                 <a class="nav-link dropdown-toggle hide-arrow p-0" href="javascript:void(0);"
                                     data-bs-toggle="dropdown">
                                     <div class="avatar avatar-online">
-                                        <img src="{{ asset('/img/avatars/1.png') }}" alt
+                                        <img src="{{ auth()->user()->photo_url }}" alt
                                             class="w-px-40 h-auto rounded-circle" />
                                     </div>
                                 </a>
@@ -148,13 +148,15 @@
                                             <div class="d-flex">
                                                 <div class="flex-shrink-0 me-3">
                                                     <div class="avatar avatar-online">
-                                                        <img src="{{ asset('/img/avatars/1.png') }}" alt
+                                                        <img src="{{ auth()->user()->photo_url }}" alt
                                                             class="w-px-40 h-auto rounded-circle" />
                                                     </div>
                                                 </div>
                                                 <div class="flex-grow-1">
-                                                    <h6 class="mb-0">John Doe</h6>
-                                                    <small class="text-body-secondary">Admin</small>
+                                                    {{-- <strong>{{ Auth::user()->name }}!</strong> --}}
+                                                    <h6 class="mb-0">{{ Auth::user()->name }}</h6>
+                                                    <small
+                                                        class="text-body-secondary">{{ Auth::user()->role }}</small>
                                                 </div>
                                             </div>
                                         </a>
@@ -163,23 +165,8 @@
                                         <div class="dropdown-divider my-1"></div>
                                     </li>
                                     <li>
-                                        <a class="dropdown-item" href="{{ route('admin.profile') }}">
+                                        <a class="dropdown-item" href="{{ route('admin.profile.index') }}">
                                             <i class="icon-base bx bx-user icon-md me-3"></i><span>My Profile</span>
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a class="dropdown-item" href="#">
-                                            <i class="icon-base bx bx-cog icon-md me-3"></i><span>Settings</span>
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a class="dropdown-item" href="#">
-                                            <span class="d-flex align-items-center align-middle">
-                                                <i
-                                                    class="flex-shrink-0 icon-base bx bx-credit-card icon-md me-3"></i><span
-                                                    class="flex-grow-1 align-middle">Billing Plan</span>
-                                                <span class="flex-shrink-0 badge rounded-pill bg-danger">4</span>
-                                            </span>
                                         </a>
                                     </li>
                                     <li>
@@ -283,7 +270,7 @@
             })
         });
     </script>
-    @yield('js')
+    @yield('scripts')
     {{-- <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script> --}}
 </body>
 
