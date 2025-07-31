@@ -1,27 +1,20 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Employee;
 
+use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
 use App\Enums\UserGender;
 use App\Enums\UserRole;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\Validator;
 
-class ProfileController extends Controller
+class EmployeeProfileController extends Controller
 {
     public function profile()
     {
         $user = auth()->user();
-
-        // if ($user->role == 'admin') {
-        //     return view('admin.profile.index', compact('user'));
-        // } elseif ($user->role == 'employee') {
-        //     return view('employee.pofile.index', compact('user'));
-        // }
-        // abort(403, 'Unauthorized');
-        return view('admin.profile.index', compact('user'));
+        return view('employee.profile.index', compact('user'));
     }
 
     public function store(Request $request)
@@ -58,7 +51,7 @@ class ProfileController extends Controller
                 $user->save();
             }
 
-            return redirect()->route('admin.profile.index')->with('success', 'Profile updated successfully!');
+            return redirect()->route('employee.profile.index')->with('success', 'Profile updated successfully!');
         } catch (\Exception $e) {
             return redirect()->back()->with('error', 'Failed to upload profile photo. Please try again.');
         }
@@ -88,7 +81,7 @@ class ProfileController extends Controller
             ]);
             $user = User::findOrFail($id);
             $user->update($validated);
-            return redirect()->route('admin.profile.index')->with('success', 'Data Profile berhasil diperbarui.');
+            return redirect()->route('employee.profile.index')->with('success', 'Data Profile berhasil diperbarui.');
         } catch (\Illuminate\Validation\ValidationException $e) {
             throw $e;
         } catch (\Exception $e) {

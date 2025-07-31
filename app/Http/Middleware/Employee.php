@@ -15,12 +15,10 @@ class Employee
      * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
      */
     public function handle(Request $request, Closure $next): Response
-     {
-        // return $next($request);
+    {
         if (auth()->user()->role === UserRole::EMPLOYEE) {
             return $next($request);
         }
-
-        return redirect('forbidden')->with('error', "You don't have admin access.");
+        return redirect('forbidden')->with('error', "You don't have employee access.");
     }
 }

@@ -43,6 +43,7 @@ class UserController extends Controller
                 'telephone' => 'nullable|string|max:15|regex:/^[0-9]+$/',
                 'password' => 'required'
             ]);
+            ///
             $user = new user();
             $user->user_id = uniqid();
             $user->name = $validated['name'];

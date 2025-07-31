@@ -12,11 +12,11 @@ use App\Enums\UserRole;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class User extends Authenticatable
 {
     use HasApiTokens, HasFactory, Notifiable;
-
     /**
      * The attributes that are mass assignable.
      *
@@ -39,7 +39,6 @@ class User extends Authenticatable
         'updated_by',
         'password',
     ];
-
     /**
      * The attributes that should be hidden for serialization.
      *
@@ -49,7 +48,6 @@ class User extends Authenticatable
         'password',
         'remember_token',
     ];
-
     /**
      * The attributes that should be cast.
      *
@@ -61,19 +59,34 @@ class User extends Authenticatable
         'role' => UserRole::class,
         'gender' => UserGender::class,
     ];
-
     public function creator()
     {
         return $this->belongsTo(User::class, 'created_by', 'user_id');
     }
-    public function location(): BelongsTo
+    // public function location()
+    // {
+    //     return $this->hasOne(UserLocation::class, 'user_id');
+    // }
+
+    // public function location(): BelongsTo
+    // {
+    //     return $this->belongsTo(Location::class, 'location_id', 'location_id')->withDefault();
+    // }
+    // Di model User
+    public function locations(): BelongsToMany
     {
-        return $this->belongsTo(Location::class, 'location_id', 'location_id')->withDefault();
+        return $this->belongsToMany(
+            Location::class,
+            'office_location_user', // nama tabel pivot
+            'user_id',             // foreign key untuk user di tabel pivot
+            'location_id'          // foreign key untuk location di tabel pivot
+        );
     }
+
     public function setLocationIdAttribute($value)
     {
-        if (!Location::where('location_id', $value)->exist()) {
-            throw new \InvalidArgumentException("Invalid location_id");
+        if (!Location::where('location_id', $value)->exists()) {
+            throw new \InvalidArgumentException("ID lokasi tidak valid");
         }
         $this->attributes['location_id'] = $value;
     }
@@ -83,9 +96,8 @@ class User extends Authenticatable
     }
     public function getOfficeNameAttribute()
     {
-        return $this->location ? $this->location->office_name : null;
+        return $this->locations->first()?->office_name;
     }
-
     public function getPhotoUrlAttribute(): string
     {
         if ($this->profile_picture_url && Storage::disk('public')->exists($this->profile_picture_url)) {

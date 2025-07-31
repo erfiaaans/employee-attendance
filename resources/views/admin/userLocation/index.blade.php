@@ -5,11 +5,11 @@
             <div class="card md-12">
                 <div class="col-mb-4">
                     <div class="card-header d-flex justify-content-between align-items-center">
-                        <h5 class="mb-0">{{ __('Daftar Pegawai') }}</h5>
+                        <h5 class="mb-0">{{ __('Daftar Lokasi Pegawai') }}</h5>
                     </div>
-                    @include('admin.user.create')
+                    @include('admin.userLocation.create')
                     <div class="card-body">
-                        <form method="GET test" action="{{ route('admin.user') }}">
+                        <form method="GET" action="{{ route('admin.userLocation.index') }}">
                             <div class="row mb-2">
                                 <div class="col-md-12">
                                     <div class="d-flex align-items-center flex-wrap gap-2">
@@ -23,10 +23,10 @@
                                                 Pilih Pegawai
                                             </button>
                                             <ul class="dropdown-menu">
-                                                @foreach ($allUsers as $user)
+                                                @foreach ($usersLocations as $userLocation)
                                                     <li>
                                                         <a class="dropdown-item"
-                                                            href="{{ route('admin.user', ['search' => $user->name]) }}">{{ $user->name }}</a>
+                                                            href="{{ route('admin.userLocation.index', ['search' => $userLocation->name]) }}">{{ $userLocation->name }}</a>
                                                     </li>
                                                 @endforeach
                                             </ul>
@@ -41,33 +41,35 @@
                                     <tr>
                                         <th>No</th>
                                         <th>Nama Pegawai</th>
-                                        <th>Role</th>
-                                        <th>Jabatan</th>
-                                        <th>Jenis Kelamin</th>
-                                        <th>Telepon</th>
-                                        <th>Email</th>
                                         <th>Foto</th>
+                                        <th>Jabatan</th>
+                                        <th>Nama Kantor</th>
                                         <th style="width: 110px;">Aksi</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @forelse ($users as $index => $user)
+                                    @forelse ($usersLocations as $index => $userLocation)
                                         <tr>
-                                            <td>{{ $index + $users->firstItem() }}</td>
-                                            <td>{{ $user->name }}</td>
-                                            <td>{{ $user->role }}</td>
-                                            <td>{{ $user->position }}</td>
-                                            <td>{{ $user->gender }}</td>
-                                            <td>{{ $user->telephone }}</td>
-                                            <td>{{ $user->email }}</td>
-                                            <td>{{ $user->profile_picture_url }}</td>
+                                            <td>{{ $index + $usersLocations->firstItem() + $index }}</td>
+                                            <td>{{ $userLocation->user->name }}</td>
+                                            <td>
+                                                @if ($userLocation->user->photo_url)
+                                                    <img src="{{ $userLocation->user->photo_url }}" alt="Profile"
+                                                        width="60">
+                                                @else
+                                                    -
+                                                @endif
+                                            </td>
+                                            <td>{{ $userLocation->user->position }}</td>
+                                            <td>{{ $userLocation->locations->office_name }}</td>
                                             <td class="text-center">
                                                 <div class="btn-group">
-                                                    <form action="{{ route('admin.user.destroy', $user->user_id) }}"
+                                                    <form
+                                                        action="{{ route('admin.userLocation.destroy', $userLocation->user_id) }}"
                                                         method="POST">
                                                         @csrf
                                                         @method('DELETE')
-                                                        <a href="{{ route('admin.user.edit', $user->user_id) }}"
+                                                        <a href="{{ route('admin.userLocation.edit', $userLocation->user_id) }}"
                                                             class="btn btn-icon btn-primary btn-sm">
                                                             <span class="tf-icons bx bx-edit-alt text-white"></span>
                                                         </a>
@@ -89,16 +91,18 @@
                         <div class="my-4 px-3">
                             <nav aria-label="...">
                                 <ul class="pagination">
-                                    <li class="page-item {{ $users->onFirstPage() ? 'disabled' : '' }}">
-                                        <a class="page-link" href="{{ $users->previousPageUrl() ?? '#' }}">Previous</a>
+                                    <li class="page-item {{ $usersLocations->onFirstPage() ? 'disabled' : '' }}">
+                                        <a class="page-link"
+                                            href="{{ $usersLocations->previousPageUrl() ?? '#' }}">Previous</a>
                                     </li>
-                                    @for ($i = 1; $i <= $users->lastPage(); $i++)
-                                        <li class="page-item {{ $i == $users->currentPage() ? 'active' : '' }}">
-                                            <a class="page-link" href="{{ $users->url($i) }}">{{ $i }}</a>
+                                    @for ($i = 1; $i <= $usersLocations->lastPage(); $i++)
+                                        <li class="page-item {{ $i == $usersLocations->currentPage() ? 'active' : '' }}">
+                                            <a class="page-link"
+                                                href="{{ $usersLocations->url($i) }}">{{ $i }}</a>
                                         </li>
                                     @endfor
-                                    <li class="page-item {{ $users->hasMorePages() ? '' : 'disabled' }}">
-                                        <a class="page-link" href="{{ $users->nextPageUrl() ?? '#' }}">Next</a>
+                                    <li class="page-item {{ $usersLocations->hasMorePages() ? '' : 'disabled' }}">
+                                        <a class="page-link" href="{{ $usersLocations->nextPageUrl() ?? '#' }}">Next</a>
                                     </li>
                                 </ul>
                             </nav>
@@ -108,7 +112,7 @@
             </div>
         </div>
         <div class="d-flex justify-content-end">
-            {{ $users->withQueryString()->links() }}
+            {{ $usersLocations->withQueryString()->links() }}
         </div>
     </div>
 @endsection

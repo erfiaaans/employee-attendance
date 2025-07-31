@@ -8,7 +8,8 @@
         content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0" />
     <title>Employee Attendance</title>
     <meta name="description" content="" />
-    <link rel="icon" type="image/x-icon" href="{{ asset('/img/favicon/favicon.ico') }}" />
+    <link rel="icon" type="image/x-icon" href="{{ asset('/img/icons/attendance.png') }}" width="30" height="30"
+        alt="logo" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -34,7 +35,8 @@
                     <a href="index.html" class="app-brand-link">
                         <span class="app-brand-logo demo">
                             <span class="text-primary">
-                                <img src="/img/icons/owl.png" width="25" height="42" alt="logo owl" />
+                                <img src="{{ asset('/img/icons/attendance.png') }}" width="30" height="30"
+                                    alt="logo" />
                                 <defs>
                                     <path
                                         d="M13.7918663,0.358365126 L3.39788168,7.44174259 C0.566865006,9.69408886 -0.379795268,12.4788597 0.557900856,15.7960551 C0.68998853,16.2305145 1.09562888,17.7872135 3.12357076,19.2293357 C3.8146334,19.7207684 5.32369333,20.3834223 7.65075054,21.2172976 L7.59773219,21.2525164 L2.63468769,24.5493413 C0.445452254,26.3002124 0.0884951797,28.5083815 1.56381646,31.1738486 C2.83770406,32.8170431 5.20850219,33.2640127 7.09180128,32.5391577 C8.347334,32.0559211 11.4559176,30.0011079 16.4175519,26.3747182 C18.0338572,24.4997857 18.6973423,22.4544883 18.4080071,20.2388261 C17.963753,17.5346866 16.1776345,15.5799961 13.0496516,14.3747546 L10.9194936,13.4715819 L18.6192054,7.984237 L13.7918663,0.358365126 Z"
@@ -86,32 +88,50 @@
                 </div>
                 <div class="menu-divider mt-0"></div>
                 <div class="menu-inner-shadow"></div>
-                <ul class="menu-inner py-1">
-                    <li class="menu-item">
-                        <a href="{{ route('admin.dashboard') }}" class="menu-link">
-                            <i class="menu-icon tf-icons bx bx-home-smile"></i>
-                            <div class="text-truncate" data-i18n="Dashboards">Dashboards</div>
-                        </a>
-                    </li>
-                    <li class="menu-item">
-                        <a href="{{ route('admin.location') }}" class="menu-link">
-                            <i class="menu-icon tf-icons bx bx-collection"></i>
-                            <div class="text-truncate" data-i18n="Basic">Location</div>
-                        </a>
-                    </li>
-                    <li class="menu-item">
-                        <a href="{{ route('admin.user') }}" class="menu-link">
-                            <i class="menu-icon tf-icons bx bx-crown"></i>
-                            <div class="text-truncate" data-i18n="Daftar-Pegawai">Daftar Pegawai</div>
-                        </a>
-                    </li>
-                    <li class="menu-item">
-                        <a href="{{ route('admin.attendance') }}" class="menu-link">
-                            <i class="menu-icon tf-icons bx bx-crown"></i>
-                            <div class="text-truncate" data-i18n="Daftar-Pegawai">Riwayat Absensi</div>
-                        </a>
-                    </li>
-                </ul>
+
+                @if (auth()->user()->role === App\Enums\UserRole::ADMIN)
+                    <ul class="menu-inner py-1">
+                        <li class="menu-item">
+                            <a href="{{ route('admin.dashboard') }}" class="menu-link">
+                                <i class="menu-icon tf-icons bx bx-home-smile"></i>
+                                <div class="text-truncate" data-i18n="Dashboards">Dashboards</div>
+                            </a>
+                        </li>
+                        <li class="menu-item">
+                            <a href="{{ route('admin.location') }}" class="menu-link">
+                                <i class="menu-icon tf-icons bx bx-collection"></i>
+                                <div class="text-truncate" data-i18n="Basic">Location</div>
+                            </a>
+                        </li>
+                        <li class="menu-item">
+                            <a href="{{ route('admin.user') }}" class="menu-link">
+                                <i class="menu-icon tf-icons bx bx-crown"></i>
+                                <div class="text-truncate" data-i18n="Daftar-Pegawai">Daftar Pegawai</div>
+                            </a>
+                        </li>
+                        <li class="menu-item">
+                            <a href="{{ route('admin.userLocation.index') }}" class="menu-link">
+                                <i class="menu-icon tf-icons bx bx-store"></i>
+                                <div class="text-truncate" data-i18n="Daftar-Pegawai">Lokasi User</div>
+                            </a>
+                        </li>
+                        <li class="menu-item">
+                            <a href="{{ route('admin.attendance') }}" class="menu-link">
+                                <i class="menu-icon tf-icons bx bx-detail"></i>
+                                <div class="text-truncate" data-i18n="Daftar-Pegawai">Riwayat Absensi</div>
+                            </a>
+                        </li>
+                    </ul>
+                @else
+                    <ul class="menu-inner py-1">
+                        <li class="menu-item">
+                            <a href="#" class="menu-link">
+                                <i class="menu-icon tf-icons bx bx-home-smile"></i>
+                                <div class="text-truncate" data-i18n="Dashboards">Dashboards Employee</div>
+                            </a>
+                        </li>
+                    </ul>
+                @endif
             </aside>
             <div class="layout-page">
                 <nav class="layout-navbar container-fluid navbar-detached navbar navbar-expand-xl align-items-center bg-navbar-theme"
@@ -165,9 +185,17 @@
                                         <div class="dropdown-divider my-1"></div>
                                     </li>
                                     <li>
-                                        <a class="dropdown-item" href="{{ route('admin.profile.index') }}">
-                                            <i class="icon-base bx bx-user icon-md me-3"></i><span>My Profile</span>
-                                        </a>
+                                        @if (auth()->user()->role === App\Enums\UserRole::ADMIN)
+                                            <a class="dropdown-item" href="{{ route('admin.profile.index') }}">
+                                                <i class="icon-base bx bx-user icon-md me-3"></i><span>My
+                                                    Profile</span>
+                                            </a>
+                                        @else
+                                            <a class="dropdown-item" href="{{ route('employee.profile.index') }}">
+                                                <i class="icon-base bx bx-user icon-md me-3"></i><span>My
+                                                    Profile</span>
+                                            </a>
+                                        @endif
                                     </li>
                                     <li>
                                         <div class="dropdown-divider my-1"></div>
@@ -193,23 +221,21 @@
                     <div class="container-fluid flex-grow-1 container-p-y">
                         @yield('content')
                     </div>
-                    <footer class="content-footer footer bg-footer-theme text-center"
-                        style="background: linear-gradient(90deg, #00c6ff, #0072ff);">
+                    <footer class="content-footer footer bg-footer-theme text-center bg-primary">
                         <div class="container-fluid">
                             <div class="footer-container py-4 d-flex justify-content-center">
-                                <div class="mb-2 mb-md-0">
+                                <div class="mb-2 mb-md-0 text-white">
                                     ©
-                                    <script>
+                                    <script class="text-white">
                                         document.write(new Date().getFullYear());
                                     </script>
                                     Attenguard by
                                     <a href="https://onmeso.co.id/" target="_blank"
-                                        class="footer-link text-body-emphasis">onmeso.co.id</a>
+                                        class="footer-link text-white">onmeso.co.id</a>
                                 </div>
                             </div>
                         </div>
                     </footer>
-
                     <div class="content-backdrop fade"></div>
                 </div>
             </div>

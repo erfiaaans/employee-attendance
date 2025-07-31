@@ -23,7 +23,7 @@ class OfficeLocationUser extends Model
         return $this->belongsTo(User::class, 'user_id', 'user_id');
     }
 
-    public function location()
+    public function locations()
     {
         return $this->belongsTo(Location::class, 'location_id', 'location_id');
     }

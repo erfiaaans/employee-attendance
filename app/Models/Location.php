@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Location extends Model
 {
@@ -46,8 +47,12 @@ class Location extends Model
     {
         return $this->belongsTo(User::class, 'updated_by', 'user_id')->withDefault();
     }
-    public function users(): HasMany
+    // public function users(): HasMany
+    // {
+    //     return $this->hasMany(User::class, 'location_id', 'location_id');
+    // }
+    public function users(): BelongsToMany
     {
-        return $this->hasMany(User::class, 'location_id', 'location_id');
+        return $this->belongsToMany(User::class, 'office_location_user', 'location_id', 'user_id');
     }
 }
