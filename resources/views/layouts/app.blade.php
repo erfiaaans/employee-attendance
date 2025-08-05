@@ -125,9 +125,27 @@
                 @else
                     <ul class="menu-inner py-1">
                         <li class="menu-item">
-                            <a href="#" class="menu-link">
+                            <a href="{{ route('employee.dashboard') }}" class="menu-link">
                                 <i class="menu-icon tf-icons bx bx-home-smile"></i>
-                                <div class="text-truncate" data-i18n="Dashboards">Dashboards Employee</div>
+                                <div class="text-truncate" data-i18n="Dashboards">Dashboard</div>
+                            </a>
+                        </li>
+                        <li class="menu-item">
+                            <a href="{{ route('employee.clock.clockin') }}" class="menu-link">
+                                <i class="menu-icon tf-icons bx bx-crown"></i>
+                                <div class="text-truncate" data-i18n="Daftar-Pegawai">Clock In</div>
+                            </a>
+                        </li>
+                        <li class="menu-item">
+                            <a href="{{ route('employee.clock.clockout') }}" class="menu-link">
+                                <i class="menu-icon tf-icons bx bx-store"></i>
+                                <div class="text-truncate" data-i18n="Daftar-Pegawai">Clock Out</div>
+                            </a>
+                        </li>
+                        <li class="menu-item">
+                            <a href="{{ route('employee.attendance.index') }}" class="menu-link">
+                                <i class="menu-icon tf-icons bx bx-detail"></i>
+                                <div class="text-truncate" data-i18n="Daftar-Pegawai">Riwayat Absensi</div>
                             </a>
                         </li>
                     </ul>

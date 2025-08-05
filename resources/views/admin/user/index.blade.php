@@ -1,13 +1,17 @@
 @extends('layouts.app')
 @section('content')
     <div class="container-xxl flex-grow-1 container-p-y">
+        <h4 class="py-3 mb-4">
+            <a href="#"><span class="text-muted fw-light">{{ __('Dashboards') }} /</span></a>
+            <a href="#" class="text-secondary">{{ __('Daftar Pegawai') }}</a>
+        </h4>
+        @include('admin.user.create')
         <div class="row">
-            <div class="card md-12">
-                <div class="col-mb-4">
+            <div class="col-md-12">
+                <div class="card mb-4">
                     <div class="card-header d-flex justify-content-between align-items-center">
-                        <h5 class="mb-0">{{ __('Daftar Pegawai') }}</h5>
+                        <h5 class="mb-0">{{ __('List Data Pegawai') }}</h5>
                     </div>
-                    @include('admin.user.create')
                     <div class="card-body">
                         <form method="GET test" action="{{ route('admin.user') }}">
                             <div class="row mb-2">
@@ -60,7 +64,13 @@
                                             <td>{{ $user->gender }}</td>
                                             <td>{{ $user->telephone }}</td>
                                             <td>{{ $user->email }}</td>
-                                            <td>{{ $user->profile_picture_url }}</td>
+                                            <td>
+                                                @if ($user->user)
+                                                    <img src="{{ $user->user->photo_url }}" alt="Profile" width="60">
+                                                @else
+                                                    -
+                                                @endif
+                                            </td>
                                             <td class="text-center">
                                                 <div class="btn-group">
                                                     <form action="{{ route('admin.user.destroy', $user->user_id) }}"

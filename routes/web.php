@@ -41,6 +41,7 @@ Route::group(['namespace' => '', 'prefix' => 'admin',  'middleware' => ['auth', 
     Route::put('profile/{id}', [ProfileController::class, 'updateData'])->name('admin.profile.updateData');
 
     Route::get('user-location', [UserLocationController::class, 'index'])->name('admin.userLocation.index');
+    Route::post('user-location', [UserLocationController::class, 'store'])->name('admin.userLocation.store');
     Route::get('user-location/{id}/edit', [UserLocationController::class, 'edit'])->name('admin.userLocation.edit');
     Route::put('user-location/{id}', [UserLocationController::class, 'update'])->name('admin.userLocation.update');
     Route::delete('user-location/{id}', [UserLocationController::class, 'destroy'])->name('admin.userLocation.destroy');
@@ -50,9 +51,15 @@ Route::group(['namespace' => '', 'prefix' => 'admin',  'middleware' => ['auth', 
 Route::group(['namespace' => '', 'prefix' => 'employee',  'middleware' => ['auth', 'employee']], function () {
     Route::get('dashboard', [EmployeeController::class, 'employeeGate'])->name('employee.dashboard');
 
-    Route::get('attendance', [AttendanceController::class, 'index'])->name('employee.attendance');
-    Route::get('clock_in', [AttendanceController::class, 'index'])->name('employee.clock_in');
-    Route::get('clock_out', [AttendanceController::class, 'index'])->name('employee.clock_out');
+    Route::get('clock/in', [AttendanceController::class, 'clockIn'])->name('employee.clock.clockin');
+    Route::post('clock/in', [AttendanceController::class, 'storeClockIn'])->name('employee.clock.clockin.store');
+    Route::get('clock/out', [AttendanceController::class, 'clockOut'])->name('employee.clock.clockout');
+    Route::post('clock/out', [AttendanceController::class, 'storeClockOut'])->name('employee.clock.clockout.store');
+
+    Route::get('attendance', [AttendanceController::class, 'index'])->name('employee.attendance.index');
+
+    // Route::get('clock_in', [AttendanceController::class, 'index'])->name('employee.clock_in');
+    // Route::get('clock_out', [AttendanceController::class, 'index'])->name('employee.clock_out');
 
     Route::get('profile', [EmployeeProfileController::class, 'profile'])->name('employee.profile.index');
     Route::put('profile/photo/{id}', [EmployeeProfileController::class, 'updatePhoto'])->name('employee.profile.upload_photo');

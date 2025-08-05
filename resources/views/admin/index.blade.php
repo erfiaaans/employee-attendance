@@ -37,6 +37,16 @@
                     </a>
                 </div>
                 <div class="col-12 col-md-6 col-xl-3 mb-4">
+                    <a href="{{ route('admin.location') }}" class="text-decoration-none text-dark">
+                        <div class="card square-card">
+                            <div class="card-body d-flex flex-column align-items-center justify-content-center">
+                                <img src="{{ asset('img/icons/lokasi_user.png') }}" alt="Office" class="icon-img mb-3" />
+                                <p class="mb-0 fw-bold">Lokasi Pegawai</p>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                <div class="col-12 col-md-6 col-xl-3 mb-4">
                     <a href="{{ route('admin.user') }}" class="text-decoration-none text-dark">
                         <div class="card square-card">
                             <div class="card-body d-flex flex-column align-items-center justify-content-center">

@@ -27,28 +27,27 @@
                     </a>
                 </div>
                 <div class="col-12 col-md-6 col-xl-3 mb-4">
-                    <a href="{{ route('employee.clock_in') }}" class="text-decoration-none text-dark">
+                    <a href="{{ route('employee.clock.clockin') }}" class="text-decoration-none text-dark">
                         <div class="card square-card">
                             <div class="card-body d-flex flex-column align-items-center justify-content-center">
-                                <img src="{{ asset('img/icons/clock_in.png') }}" alt="Office" class="icon-img mb-3" />
+                                <img src="{{ asset('img/icons/clock_in.png') }}" alt="Clock In" class="icon-img mb-3" />
                                 <p class="mb-0 fw-bold">Clock In</p>
                             </div>
                         </div>
                     </a>
                 </div>
                 <div class="col-12 col-md-6 col-xl-3 mb-4">
-                    <a href="{{ route('employee.clock_out') }}" class="text-decoration-none text-dark">
+                    <a href="{{ route('employee.clock.clockout') }}" class="text-decoration-none text-dark">
                         <div class="card square-card">
                             <div class="card-body d-flex flex-column align-items-center justify-content-center">
-                                <img src="{{ asset('img/icons/clock_out.png') }}" alt="Daftar Pegawai"
-                                    class="icon-img mb-3" />
+                                <img src="{{ asset('img/icons/clock_out.png') }}" alt="Clock Out" class="icon-img mb-3" />
                                 <p class="mb-0 fw-bold">Clock Out</p>
                             </div>
                         </div>
                     </a>
                 </div>
                 <div class="col-12 col-md-6 col-xl-3 mb-4">
-                    <a href="{{ route('employee.attendance') }}" class="text-decoration-none text-dark">
+                    <a href="{{ route('employee.attendance.index') }}" class="text-decoration-none text-dark">
                         <div class="card square-card">
                             <div class="card-body d-flex flex-column align-items-center justify-content-center">
                                 <img src="{{ asset('img/icons/absensi.png') }}" alt="Riwayat Absensi"

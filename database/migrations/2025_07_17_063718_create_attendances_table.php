@@ -12,22 +12,20 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('attendances', function (Blueprint $table) {
-            $table->string('attendance_id', 36)->primary();
+            $table->string('attendance_id')->primary();
 
-            $table->string('user_id', 36);
-            $table->string('location_id', 36);
+            $table->string('user_id');
+            $table->string('location_id');
 
             $table->dateTime('clock_in_time')->nullable();
-            $table->text('clock_in_photo_url')->nullable();
+            $table->string('clock_in_photo_url')->nullable();
             $table->decimal('clock_in_latitude', 10, 8)->nullable();
             $table->decimal('clock_in_longitude', 11, 8)->nullable();
 
             $table->dateTime('clock_out_time')->nullable();
-            $table->text('clock_out_photo_url')->nullable();
+            $table->string('clock_out_photo_url')->nullable();
             $table->decimal('clock_out_latitude', 10, 8)->nullable();
             $table->decimal('clock_out_longitude', 11, 8)->nullable();
-
-            $table->string('status', 36)->nullable();
 
             $table->foreign('user_id')->references('user_id')->on('users');
             $table->foreign('location_id')->references('location_id')->on('locations');

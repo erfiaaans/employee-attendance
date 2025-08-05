@@ -9,9 +9,11 @@ class OfficeLocationUser extends Model
 {
     use HasFactory;
     protected $table = 'office_location_user';
-    protected $primaryKey = 'office_user_id';
+    protected $primaryKey = 'location_user_id';
+    public $incrementing = false;
+    protected $keyType = 'string';
     protected $fillable = [
-        'office_location_user',
+        'location_user_id',
         'user_id',
         'location_id',
         'created_by',
