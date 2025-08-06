@@ -12,23 +12,26 @@
             <div class="card-body">
                 <form action="{{ route('admin.userLocation.store') }}" method="POST">
                     @csrf
-                    <div class="mb-3">
-                        <label for="user_id" class="form-label">Pilih Pegawai</label>
-                        <select name="user_id" id="user_id" class="form-select form-select-sm" required>
-                            <option value="">-- Pilih Pegawai --</option>
-                            @foreach ($users as $user)
-                                <option value="{{ $user->user_id }}">{{ $user->name }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-                    <div class="mb-3">
-                        <label for="location_id" class="form-label">Pilih Kantor</label>
-                        <select name="location_id" id="location_id" class="form-select form-select-sm" required>
-                            <option value="">-- Pilih Kantor --</option>
-                            @foreach ($locations as $location)
-                                <option value="{{ $location->location_id }}">{{ $location->office_name }}</option>
-                            @endforeach
-                        </select>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="user_id" class="form-label">Pilih Pegawai</label>
+                            <select name="user_id" id="user_id" class="form-select form-select-sm" required>
+                                <option value="">-- Pilih Pegawai --</option>
+                                @foreach ($users as $user)
+                                    <option value="{{ $user->user_id }}">{{ $user->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label for="location_id" class="form-label">Pilih Kantor</label>
+                            <select name="location_id" id="location_id" class="form-select form-select-sm" required>
+                                <option value="">-- Pilih Kantor --</option>
+                                @foreach ($locations as $location)
+                                    <option value="{{ $location->location_id }}">{{ $location->office_name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
                     </div>
                     <button type="submit" class="btn btn-primary btn-sm">Simpan</button>
                 </form>

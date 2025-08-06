@@ -59,7 +59,7 @@ class UserLocationController extends Controller
         $users = User::orderBy('name')->get();
         $locations = Location::orderBy('office_name')->get();
 
-        return view('admin.userLocation.edit', compact('officeLocationUser', 'users', 'locations'));
+        return view('admin.userLocation.index', compact('officeLocationUser', 'users', 'locations'));
     }
     public function update(Request $request, $id)
     {

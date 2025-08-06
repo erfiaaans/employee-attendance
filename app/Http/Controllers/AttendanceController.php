@@ -3,9 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Models\Attendance;
+use App\Models\Location;
 use Illuminate\Http\Request;
 use App\Models\User;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Storage;
 
 class AttendanceController extends Controller
 {
@@ -47,72 +49,5 @@ class AttendanceController extends Controller
         $allUsers = User::where('role', 'employee')->get();
 
         return view('admin.attendance.index', compact('attendances', 'allUsers', 'userFilter', 'search'));
-    }
-
-    public function clockIn()
-    {
-        return view('employee.clock.clockin');
-    }
-
-    public function storeClockIn(Request $request)
-    {
-        $request->validate([
-            'clock_in_latitude' => 'required|numeric',
-            'clock_in_longitude' => 'required|numeric',
-            'clock_in_photo' => 'required|image|mimes:jpg,jpeg,png|max:2048',
-        ]);
-
-        $user = auth()->user();
-        $photoPath = $request->file('clock_in_photo')->store('data/clock_in_photos', 'public');
-
-        Attendance::create([
-            'attendance_id' => Str::uuid(),
-            'user_id' => $user->user_id,
-            'location_id' => $user->location_id,
-            'clock_in_time' => now(),
-            'clock_in_latitude' => $request->input('clock_in_latitude'),
-            'clock_in_longitude' => $request->input('clock_in_longitude'),
-            'clock_in_photo_url' => $photoPath,
-            'created_by' => $user->user_id,
-        ]);
-
-        return redirect()->route('employee.clock.clockin')->with('success', 'Clock In successful');
-    }
-
-    public function clockOut()
-    {
-        return view('employee.clock.clockout');
-    }
-
-    public function storeClockOut(Request $request)
-    {
-        $request->validate([
-            'clock_out_latitude' => 'required|numeric',
-            'clock_out_longitude' => 'required|numeric',
-            'clock_out_photo_url' => 'required|image|mimes:jpg,jpeg,png|max:2048',
-        ]);
-
-        $user = auth()->user();
-        $photoPath = $request->file('clock_out_photo')->store('data/clock_out_photos', 'public');
-
-        $attendance = Attendance::where('user_id', $user->user_id)
-            ->whereDate('clock_in_time', now()->toDateString())
-            ->whereNull('clock_out_time')
-            ->latest()
-            ->first();
-
-        if (!$attendance) {
-            return redirect()->route('employee.clock.clockout')->withErrors('Belum melakukan Clock In.');
-        }
-        $photoPath = $request->file('clock_out_photo')->store('data/clock_out_photos', 'public');
-        $attendance->update([
-            'clock_out_time' => now(),
-            'clock_out_latitude' => $request->input('clock_out_latitude'),
-            'clock_out_longitude' => $request->input('clock_out_longitude'),
-            'clock_out_photo_url' => $photoPath,
-            'created_by' => $user->user_id,
-        ]);
-
-        return redirect()->route('employee.clock.out')->with('success', 'Clock Out successful');
     }
 }

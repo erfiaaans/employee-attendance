@@ -10,7 +10,9 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\UserLocationController;
 use App\Http\Controllers\Employee\EmployeeProfileController;
-use App\Models\Attendance;
+use App\Http\Controllers\Employee\ClockInController;
+use App\Http\Controllers\Employee\ClockOutController;
+use Illuminate\Support\Facades\Auth;
 
 Route::get('/', [LoginController::class, 'showLoginForm'])->name('index');
 
@@ -51,10 +53,10 @@ Route::group(['namespace' => '', 'prefix' => 'admin',  'middleware' => ['auth', 
 Route::group(['namespace' => '', 'prefix' => 'employee',  'middleware' => ['auth', 'employee']], function () {
     Route::get('dashboard', [EmployeeController::class, 'employeeGate'])->name('employee.dashboard');
 
-    Route::get('clock/in', [AttendanceController::class, 'clockIn'])->name('employee.clock.clockin');
-    Route::post('clock/in', [AttendanceController::class, 'storeClockIn'])->name('employee.clock.clockin.store');
-    Route::get('clock/out', [AttendanceController::class, 'clockOut'])->name('employee.clock.clockout');
-    Route::post('clock/out', [AttendanceController::class, 'storeClockOut'])->name('employee.clock.clockout.store');
+    Route::get('clock/in', [ClockInController::class, 'clockIn'])->name('employee.clock.clockin');
+    Route::post('clock/in', [ClockInController::class, 'storeClockIn'])->name('employee.clock.clockin.store');
+    Route::get('clock/out', [ClockOutController::class, 'clockOut'])->name('employee.clock.clockout');
+    Route::post('clock/out', [ClockOutController::class, 'storeClockOut'])->name('employee.clock.clockout.store');
 
     Route::get('attendance', [AttendanceController::class, 'index'])->name('employee.attendance.index');
 
