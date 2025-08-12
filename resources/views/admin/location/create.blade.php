@@ -79,18 +79,27 @@
                             @enderror
                         </div>
                         <div class="col-md-12">
-                            <label class="form-label">Pilih Lokasi di Map</label>
-                            <div id="map" style="height: 400px;"></div>
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <label class="form-label mb-0">Pilih Lokasi di Map</label>
+                                <div class="d-flex" style="gap: 6px;">
+                                    <input type="text" id="search-address" class="form-control form-control-sm"
+                                        placeholder="Cari alamat.." style="width: 250px;">
+                                    <button type="button" id="btn-search-address"
+                                        class="btn btn-sm btn-secondary">Cari</button>
+                                </div>
+                            </div>
+
+                            <div id="map" style="height: 400px; width: 100%;"></div>
                         </div>
-                    </div>
-                    <div class="mt-3">
-                        <button type="submit" class="btn btn-sm btn-primary">
-                            {{ isset($editLocation) ? 'Update' : 'Simpan' }}
-                        </button>
-                        @if (isset($editLocation))
-                            <a href="{{ route('admin.location') }}" class="btn btn-sm btn-secondary">Batal Edit</a>
-                        @endif
-                    </div>
+
+                        <div class="mt-3">
+                            <button type="submit" class="btn btn-sm btn-primary">
+                                {{ isset($editLocation) ? 'Update' : 'Simpan' }}
+                            </button>
+                            @if (isset($editLocation))
+                                <a href="{{ route('admin.location') }}" class="btn btn-sm btn-secondary">Batal Edit</a>
+                            @endif
+                        </div>
                 </form>
             </div>
         </div>

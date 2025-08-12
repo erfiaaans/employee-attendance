@@ -83,7 +83,7 @@
                                             <td>{{ \Carbon\Carbon::parse($attendance->clock_in_time)->format('H:i') }}</td>
                                             <td>
                                                 @if ($attendance->clock_in_photo_url)
-                                                    <img src="{{ $attendance->clock_in_photo_url }}" alt="Clock In"
+                                                    <img src="{{ $attendance->clock_in_photo_path }}" alt="Clock In"
                                                         width="60">
                                                 @else
                                                     -
@@ -98,7 +98,7 @@
                                             </td>
                                             <td>
                                                 @if ($attendance->clock_out_photo_url)
-                                                    <img src="{{ $attendance->clock_out_photo_url }}" alt="Clock Out"
+                                                    <img src="{{ $attendance->clock_out_photo_path }}" alt="Clock Out"
                                                         width="60">
                                                 @else
                                                     -

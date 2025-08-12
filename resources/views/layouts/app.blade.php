@@ -133,19 +133,19 @@
                         <li class="menu-item">
                             <a href="{{ route('employee.clock.clockin') }}" class="menu-link">
                                 <i class="menu-icon tf-icons bx bx-crown"></i>
-                                <div class="text-truncate" data-i18n="Daftar-Pegawai">Clock In</div>
+                                <div class="text-truncate" data-i18n="Clockin">Clock In</div>
                             </a>
                         </li>
                         <li class="menu-item">
                             <a href="{{ route('employee.clock.clockout') }}" class="menu-link">
                                 <i class="menu-icon tf-icons bx bx-store"></i>
-                                <div class="text-truncate" data-i18n="Daftar-Pegawai">Clock Out</div>
+                                <div class="text-truncate" data-i18n="Clockout">Clock Out</div>
                             </a>
                         </li>
                         <li class="menu-item">
                             <a href="{{ route('employee.attendance.index') }}" class="menu-link">
                                 <i class="menu-icon tf-icons bx bx-detail"></i>
-                                <div class="text-truncate" data-i18n="Daftar-Pegawai">Riwayat Absensi</div>
+                                <div class="text-truncate" data-i18n="RiwayatAbsensi">Riwayat Absensi</div>
                             </a>
                         </li>
                     </ul>

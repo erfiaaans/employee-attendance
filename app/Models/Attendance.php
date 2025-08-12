@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Storage;
 
 class Attendance extends Model
 {
@@ -39,5 +40,22 @@ class Attendance extends Model
     public function location()
     {
         return $this->belongsTo(Location::class, 'location_id', 'location_id');
+    }
+
+    public function getClockInPhotoPathAttribute(): string
+    {
+        return asset('storage/' . $this->clock_in_photo_url);
+        if ($this->clock_in_photo_url && Storage::disk('public')->exists($this->clock_in_photo_url)) {
+            return asset('storage/' . $this->clock_in_photo_url);
+        }
+        return asset('img/icons/user.png');
+    }
+
+    public function getClockOutPhotoPathAttribute(): string
+    {
+        if ($this->clock_out_photo_url && Storage::disk('public')->exists($this->clock_out_photo_url)) {
+            return asset('storage/' . $this->clock_out_photo_url);
+        }
+        return asset('img/icons/user.png');
     }
 }

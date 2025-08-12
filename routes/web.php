@@ -12,7 +12,10 @@ use App\Http\Controllers\UserLocationController;
 use App\Http\Controllers\Employee\EmployeeProfileController;
 use App\Http\Controllers\Employee\ClockInController;
 use App\Http\Controllers\Employee\ClockOutController;
+use App\Http\Controllers\Employee\EmployeeAttendance;
+use App\Http\Middleware\Employee;
 use Illuminate\Support\Facades\Auth;
+use App\Http\Controllers\Employee\EmployeeAttendanceController;
 
 Route::get('/', [LoginController::class, 'showLoginForm'])->name('index');
 
@@ -58,10 +61,7 @@ Route::group(['namespace' => '', 'prefix' => 'employee',  'middleware' => ['auth
     Route::get('clock/out', [ClockOutController::class, 'clockOut'])->name('employee.clock.clockout');
     Route::post('clock/out', [ClockOutController::class, 'storeClockOut'])->name('employee.clock.clockout.store');
 
-    Route::get('attendance', [AttendanceController::class, 'index'])->name('employee.attendance.index');
-
-    // Route::get('clock_in', [AttendanceController::class, 'index'])->name('employee.clock_in');
-    // Route::get('clock_out', [AttendanceController::class, 'index'])->name('employee.clock_out');
+    Route::get('attendance', [EmployeeAttendanceController::class, 'index'])->name('employee.attendance.index');
 
     Route::get('profile', [EmployeeProfileController::class, 'profile'])->name('employee.profile.index');
     Route::put('profile/photo/{id}', [EmployeeProfileController::class, 'updatePhoto'])->name('employee.profile.upload_photo');

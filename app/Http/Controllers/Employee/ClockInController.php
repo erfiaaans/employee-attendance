@@ -3,9 +3,11 @@
 namespace App\Http\Controllers\Employee;
 
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\UserLocationController;
 use Illuminate\Http\Request;
 use App\Models\Attendance;
 use App\Models\Location;
+use App\Models\OfficeLocationUser;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
 
@@ -17,56 +19,95 @@ class ClockInController extends Controller
         $alreadyClockedIn = Attendance::where('user_id', $user->user_id)
             ->whereDate('clock_in_time', now()->toDateString())
             ->exists();
-        $location = Location::first();
-        if (!$location) {
-            return redirect()->route('employee.clock.clockin')->withErrors('Lokasi tidak ditemukan.');
+        $locations = OfficeLocationUser::with('locations')
+            ->where('user_id', $user->user_id)
+            ->get()
+            ->pluck('locations')
+            ->filter()
+            ->values();
+        if ($locations->isEmpty()) {
+            return redirect()
+                ->route('employee.clock.clockin')
+                ->withErrors('Lokasi untuk user ini tidak ditemukan.');
         }
-        return view('employee.clock.clockin', compact('location', 'alreadyClockedIn'));
+
+        return view('employee.clock.clockin', [
+            'locations' => $locations,
+            'alreadyClockedIn' => $alreadyClockedIn,
+        ]);
     }
     public function storeClockIn(Request $request)
     {
         $request->validate([
-            'location_id' => 'required|exists:locations,location_id',
-            'clock_in_latitude' => 'required|numeric',
+            'location_id'        => 'required|exists:locations,location_id',
+            'clock_in_latitude'  => 'required|numeric',
             'clock_in_longitude' => 'required|numeric',
-            'clock_in_photo' => 'required|string',
+            'clock_in_photo'     => 'required|string',
         ]);
+
         $user = auth()->user();
-        $location = Location::find($request->input('location_id'));
+        $location = Location::findOrFail($request->input('location_id'));
+
+        // radius bisa ambil dari DB; fallback 50m
+        $radius = $location->radius_meters ?? 50;
+
         $distance = $this->calculateDistance(
             $request->input('clock_in_latitude'),
             $request->input('clock_in_longitude'),
             $location->latitude,
             $location->longitude
         );
-        if ($distance > 50) {
-            return back()->with('error', 'Clock-in ditolak! Anda berada di luar radius kantor (' . round($distance, 2) . ' m).');
+
+        if ($distance > $radius) {
+            return back()->with('error', 'Clock-in ditolak! Di luar radius kantor (' . round($distance, 2) . ' m).');
         }
-        $photoPath = $this->saveBase64Image($request->clock_in_photo, 'data/clock_in_photos');
+
+        $photoPath = $this->saveBase64ImageToAttendancePath(
+            $request->clock_in_photo,
+            $user->user_id,
+            'clockin',
+            disk: 'public'
+        );
+
         Attendance::create([
-            'attendance_id' => Str::uuid(),
-            'user_id' => $user->user_id,
-            'location_id' => $request->input('location_id'),
-            'clock_in_time' => now(),
-            'clock_in_latitude' => $request->input('clock_in_latitude'),
-            'clock_in_longitude' => $request->input('clock_in_longitude'),
-            'clock_in_photo_url' => $photoPath,
-            'created_by' => $user->user_id,
+            'attendance_id'       => Str::uuid(),
+            'user_id'             => $user->user_id,
+            'location_id'         => $request->input('location_id'),
+            'clock_in_time'       => now(),
+            'clock_in_latitude'   => $request->input('clock_in_latitude'),
+            'clock_in_longitude'  => $request->input('clock_in_longitude'),
+            'clock_in_photo_url'  => $photoPath,
+            'created_by'          => $user->user_id,
         ]);
 
         return redirect()->route('employee.clock.clockin')->with('success', 'Clock In successful');
     }
-    private function saveBase64Image($base64Image, $folder)
+    private function saveBase64ImageToAttendancePath(string $dataUrl, string $userId, string $type = 'clockin', string $disk = 'public'): string
     {
-        @list($type, $fileData) = explode(';', $base64Image);
-        @list(, $fileData) = explode(',', $fileData);
-        $extension = 'png';
-        if (strpos($type, 'jpeg') || strpos($type, 'jpg')) {
-            $extension = 'jpg';
+        if (!str_starts_with($dataUrl, 'data:')) {
+            throw new \InvalidArgumentException('Invalid data URL');
         }
-        $filename = uniqid() . '.' . $extension;
-        $path = $folder . '/' . $filename;
-        Storage::disk('public')->put($path, base64_decode($fileData));
+
+        [$meta, $content] = explode(',', $dataUrl, 2);
+        preg_match('#data:(image/\w+);base64#', $meta, $m);
+        $mime = $m[1] ?? 'image/png';
+        $ext  = str_contains($mime, 'jpeg') ? 'jpg' : explode('/', $mime)[1];
+
+        $binary = base64_decode($content);
+        if ($binary === false) {
+            throw new \RuntimeException('Gagal decode gambar');
+        }
+
+        $now = now();
+        $dir = sprintf('attendance/%s/%s', $userId, $now->format('Y/m/d'));
+        $filename = sprintf('%s-%s.%s', $type, $now->format('Hisv'), $ext); // Hisv = jammenitdetik+millis
+        $path = $dir . '/' . $filename;
+
+        Storage::disk($disk)->put($path, $binary, [
+            'visibility' => 'private',
+            'ContentType' => $mime,
+        ]);
+
         return $path;
     }
 
