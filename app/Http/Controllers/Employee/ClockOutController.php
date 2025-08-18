@@ -9,6 +9,7 @@ use App\Models\Location;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
 use App\Http\Controllers\AttendanceController;
+use App\Models\OfficeLocationUser;
 
 class ClockOutController extends Controller
 {
@@ -18,11 +19,21 @@ class ClockOutController extends Controller
         $alreadyClockedOut = Attendance::where('user_id', $user->user_id)
             ->whereDate('clock_out_time', now()->toDateString())
             ->exists();
-        $location = Location::first();
-        if (!$location) {
-            return redirect()->route('employee.clock.clockout')->withErrors('Lokasi tidak ditemukan.');
+        $locations = OfficeLocationUser::with('locations')
+            ->where('user_id', $user->user_id)
+            ->get()
+            ->pluck('locations')
+            ->filter()
+            ->values();
+        if ($locations->isEmpty()) {
+            return redirect()
+                ->route('employee.clock.clockout')
+                ->withErrors('Lokasi untuk user ini tidak ditemukan.');
         }
-        return view('employee.clock.clockout', compact('location', 'alreadyClockedOut'));
+        return view('employee.clock.clockout', [
+            'locations' => $locations,
+            'alreadyClockedOut' => $alreadyClockedOut,
+        ]);
     }
     public function storeClockOut(Request $request)
     {
@@ -34,16 +45,22 @@ class ClockOutController extends Controller
         ]);
         $user = auth()->user();
         $location = Location::find($request->input('location_id'));
+        $radius = $location->radius_meters ?? 50;
         $distance = $this->calculateDistance(
             $request->input('clock_out_latitude'),
             $request->input('clock_out_longitude'),
             $location->latitude,
             $location->longitude
         );
-        if ($distance > 50) {
+        if ($distance > $radius) {
             return back()->with('error', 'Clock-out ditolak! Anda berada di luar radius kantor (' . round($distance, 2) . ' m).');
         }
-        $photoPath = $this->saveBase64Image($request->clock_in_photo, 'data/clock_out_photos');
+        $photoPath = $this->saveBase64ImageToAttendancePath(
+            $request->clock_out_photo,
+            $user->user_id,
+            'clockout',
+            disk: 'public'
+        );
         Attendance::create([
             'attendance_id' => Str::uuid(),
             'user_id' => $user->user_id,
@@ -54,20 +71,31 @@ class ClockOutController extends Controller
             'clock_out_photo_url' => $photoPath,
             'created_by' => $user->user_id,
         ]);
-
         return redirect()->route('employee.clock.clockout')->with('success', 'Clock Out successful');
     }
-    private function saveBase64Image($base64Image, $folder)
+    private function saveBase64ImageToAttendancePath(string $dataUrl, string $userId, string $type = 'clockout', string $disk = 'public'): string
     {
-        @list($type, $fileData) = explode(';', $base64Image);
-        @list(, $fileData) = explode(',', $fileData);
-        $extension = 'png';
-        if (strpos($type, 'jpeg') || strpos($type, 'jpg')) {
-            $extension = 'jpg';
+        if (!str_starts_with($dataUrl, 'data:')) {
+            throw new \InvalidArgumentException('Invalid data URL');
         }
-        $filename = uniqid() . '.' . $extension;
-        $path = $folder . '/' . $filename;
-        Storage::disk('public')->put($path, base64_decode($fileData));
+        [$meta, $content] = explode(',', $dataUrl, 2);
+        preg_match('#data:(image/\w+);base64#', $meta, $m);
+        $mime = $m[1] ?? 'image/png';
+        $ext  = str_contains($mime, 'jpeg') ? 'jpg' : explode('/', $mime)[1];
+
+        $binary = base64_decode($content);
+        if ($binary === false) {
+            throw new \RuntimeException('Gagal decode gambar');
+        }
+        $now = now();
+        $dir = sprintf('attendance/%s/%s', $userId, $now->format('Y/m/d'));
+        $filename = sprintf('%s-%s.%s', $type, $now->format('Hisv'), $ext); // Hisv = jammenitdetik+millis
+        $path = $dir . '/' . $filename;
+
+        Storage::disk($disk)->put($path, $binary, [
+            'visibility' => 'private',
+            'ContentType' => $mime,
+        ]);
         return $path;
     }
 

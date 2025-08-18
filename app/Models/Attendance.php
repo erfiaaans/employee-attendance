@@ -12,7 +12,7 @@ class Attendance extends Model
     protected $primaryKey = 'attendance_id';
     public $incrementing = false;
     protected $keyType = 'string';
-    public $timestamps = false;
+    public $timestamps = true;
     protected $fillable = [
         'attendance_id',
         'user_id',
@@ -27,9 +27,7 @@ class Attendance extends Model
         'clock_out_photo_url',
         'status',
         'created_by',
-        'updated_by',
-        'created_at',
-        'updated_at'
+        'updated_by'
     ];
 
     public function user()

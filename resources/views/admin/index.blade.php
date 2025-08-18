@@ -2,6 +2,14 @@
 @push('styles')
     {{-- <link rel="stylesheet" href="{{ asset('css/dashboardStyle.css') }}"> --}}
 @endpush
+@php
+    $stats = $stats ?? [
+        'totalEmployees' => 0,
+        'totalLocations' => 0,
+        'totalAttendance' => 0,
+        'todayAttendance' => 0,
+    ];
+@endphp
 @section('content')
     <div class="container-xxl flex-grow-1 container-p-y">
         <h4 class="py-3 mb-4">
@@ -74,7 +82,6 @@
                         <div class="card-header d-flex justify-content-between">
                             <div class="card-title mb-0">
                                 <h5 class="mb-1 me-2">Statistik Kehadiran</h5>
-                                <p class="card-subtitle">3 Lokasi Kantor Onmeso</p>
                             </div>
                             <div class="dropdown">
                                 <button class="btn text-body-secondary p-0" type="button" id="orederStatistics"
@@ -82,7 +89,7 @@
                                     <i class="icon-base bx bx-dots-vertical-rounded icon-lg"></i>
                                 </button>
                                 <div class="dropdown-menu dropdown-menu-end" aria-labelledby="orederStatistics">
-                                    <a class="dropdown-item" href="javascript:void(0);">Refresh</a>
+                                    <a class="dropdown-item" href="javascript:void(0);" id="btn-refresh-stats">Refresh</a>
                                 </div>
                             </div>
                         </div>
@@ -90,57 +97,65 @@
                             <ul class="p-0 m-0">
                                 <li class="d-flex align-items-center mb-5">
                                     <div class="avatar flex-shrink-0 me-3">
-                                        <span class="avatar-initial rounded bg-label-primary"><i
-                                                class="icon-base bx bx-mobile-alt"></i></span>
+                                        <span class="avatar-initial rounded bg-label-primary">
+                                            <i class="icon-base bx bx-mobile-alt"></i>
+                                        </span>
                                     </div>
                                     <div class="d-flex w-100 flex-wrap align-items-center justify-content-between gap-2">
                                         <div class="me-2">
                                             <h6 class="mb-0">Total Keseluruhan Karyawan</h6>
                                         </div>
                                         <div class="user-progress">
-                                            <h6 class="mb-0">82.5k</h6>
+                                            <h6 id="stat-total-employees" class="mb-0">
+                                                {{ number_format($stats['totalEmployees']) }}</h6>
                                         </div>
                                     </div>
                                 </li>
                                 <li class="d-flex align-items-center mb-5">
                                     <div class="avatar flex-shrink-0 me-3">
-                                        <span class="avatar-initial rounded bg-label-success"><i
-                                                class="icon-base bx bx-closet"></i></span>
+                                        <span class="avatar-initial rounded bg-label-success">
+                                            <i class="icon-base bx bx-closet"></i>
+                                        </span>
                                     </div>
                                     <div class="d-flex w-100 flex-wrap align-items-center justify-content-between gap-2">
                                         <div class="me-2">
-                                            <h6 class="mb-0">Total Karyawan Clock In</h6>
+                                            <h6 class="mb-0">Total Lokasi Kantor Onmeso</h6>
                                         </div>
                                         <div class="user-progress">
-                                            <h6 class="mb-0">23.8k</h6>
+                                            <h6 id="stat-total-locations" class="mb-0">
+                                                {{ number_format($stats['totalLocations']) }}</h6>
                                         </div>
                                     </div>
                                 </li>
                                 <li class="d-flex align-items-center mb-5">
                                     <div class="avatar flex-shrink-0 me-3">
-                                        <span class="avatar-initial rounded bg-label-info"><i
-                                                class="icon-base bx bx-home-alt"></i></span>
+                                        <span class="avatar-initial rounded bg-label-info">
+                                            <i class="icon-base bx bx-home-alt"></i>
+                                        </span>
                                     </div>
                                     <div class="d-flex w-100 flex-wrap align-items-center justify-content-between gap-2">
                                         <div class="me-2">
-                                            <h6 class="mb-0">Total Karyawan Clock In</h6>
+                                            <h6 class="mb-0">Total Presensi</h6>
                                         </div>
                                         <div class="user-progress">
-                                            <h6 class="mb-0">849k</h6>
+                                            <h6 id="stat-total-attendance" class="mb-0">
+                                                {{ number_format($stats['totalAttendance']) }}</h6>
                                         </div>
                                     </div>
                                 </li>
                                 <li class="d-flex align-items-center">
                                     <div class="avatar flex-shrink-0 me-3">
-                                        <span class="avatar-initial rounded bg-label-secondary"><i
-                                                class="icon-base bx bx-football"></i></span>
+                                        <span class="avatar-initial rounded bg-label-secondary">
+                                            <i class="icon-base bx bx-football"></i>
+                                        </span>
                                     </div>
                                     <div class="d-flex w-100 flex-wrap align-items-center justify-content-between gap-2">
                                         <div class="me-2">
-                                            <h6 class="mb-0">Total Karyawan Belum Presensi</h6>
+                                            <h6 class="mb-0">Total Presensi Hari Ini</h6>
                                         </div>
                                         <div class="user-progress">
-                                            <h6 class="mb-0">99</h6>
+                                            <h6 id="stat-today-attendance" class="mb-0">
+                                                {{ number_format($stats['todayAttendance']) }}</h6>
                                         </div>
                                     </div>
                                 </li>
@@ -152,3 +167,26 @@
         </div>
     </div>
 @endsection
+@push('scripts')
+    <script>
+        const fmt = (n) => new Intl.NumberFormat().format(n);
+        document.getElementById('btn-refresh-stats')?.addEventListener('click', async () => {
+            try {
+                const res = await fetch('{{ route('admin.dashboard.stats') }}', {
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                });
+                if (!res.ok) throw new Error('Gagal mengambil data');
+                const d = await res.json();
+                const el = (id) => document.getElementById(id);
+                el('stat-total-employees').textContent = fmt(d.totalEmployees ?? 0);
+                el('stat-total-locations').textContent = fmt(d.totalLocations ?? 0);
+                el('stat-total-attendance').textContent = fmt(d.totalAttendance ?? 0);
+                el('stat-today-attendance').textContent = fmt(d.todayAttendance ?? 0);
+            } catch (e) {
+                alert(e.message);
+            }
+        });
+    </script>
+@endpush

@@ -23,9 +23,7 @@
                                         @if (request('filter'))
                                             <input type="hidden" name="filter" value="{{ request('filter') }}">
                                         @endif
-
                                         <button type="submit" class="btn btn-light btn-sm">Cari</button>
-
                                         <div class="dropdown">
                                             <button class="btn btn-secondary btn-sm dropdown-toggle" type="button"
                                                 data-bs-toggle="dropdown" aria-expanded="false">
@@ -57,7 +55,6 @@
                                 </div>
                             </div>
                         </form>
-
                         <div class="table-responsive">
                             <table class="table table-bordered table-hover">
                                 <thead class="table-light">
@@ -71,6 +68,7 @@
                                         <th>Jam Keluar</th>
                                         <th>Foto Keluar</th>
                                         <th>Lokasi Keluar</th>
+                                        <th style="width: 110px;">Aksi</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -108,6 +106,19 @@
                                                 {{ $attendance->clock_out_latitude ?? '-' }},
                                                 {{ $attendance->clock_out_longitude ?? '-' }}
                                             </td>
+                                            <td class="text-center">
+                                                <div class="btn-group">
+                                                    <form
+                                                        action="{{ route('admin.attendance.destroy', $attendance->attendance_id) }}"
+                                                        method="POST">
+                                                        @csrf
+                                                        @method('DELETE')
+                                                        <button type="submit"
+                                                            class="btn btn-icon btn-danger btn-sm swalDeleteData"><i
+                                                                class="tf-icons bx bx-trash text-white"></i></button>
+                                                    </form>
+                                                </div>
+                                            </td>
                                         </tr>
                                     @empty
                                         <tr>
@@ -116,7 +127,6 @@
                                     @endforelse
                                 </tbody>
                             </table>
-
                         </div>
                     </div>
                 </div>

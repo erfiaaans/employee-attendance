@@ -96,7 +96,6 @@
                                     </tbody>
                                 </table>
                             </div>
-                            {{-- Pagination --}}
                             <div class="my-4 px-3">
                                 <nav aria-label="...">
                                     <ul class="pagination">
@@ -128,7 +127,6 @@
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            // --- Helper: tunggu sampai elemen terlihat (punya width/height > 0)
             function whenVisible(el, cb) {
                 if (!el) return;
                 const isVisible = () => el.offsetParent !== null && el.clientWidth > 0 && el.clientHeight > 0;
@@ -144,8 +142,6 @@
                 });
                 ro.observe(el);
             }
-
-            // --- Geocoding (Nominatim)
             async function geocodeAddress(q) {
                 if (!q || q.trim().length < 3) return null;
                 const url = new URL('https://nominatim.openstreetmap.org/search');
@@ -198,8 +194,6 @@
                 if (radiusInput) {
                     radiusInput.addEventListener('input', (e) => circle.setRadius(e.target.value));
                 }
-
-                // Tombol "Lokasi Saya"
                 L.Control.LokasiSaya = L.Control.extend({
                     options: {
                         position: 'topleft'
@@ -236,15 +230,9 @@
                 });
                 L.control.lokasiSaya = (opts) => new L.Control.LokasiSaya(opts || {});
                 L.control.lokasiSaya().addTo(map);
-
-                // invalidate ukuran setelah render
                 setTimeout(() => map.invalidateSize(), 100);
             }
-
-            // Inisialisasi hanya saat kontainer terlihat
             whenVisible(mapEl, initMap);
-
-            // --- Pencarian alamat (pakai input di form sebelah label)
             async function doSearch() {
                 const input = document.getElementById('search-address');
                 const btn = document.getElementById('btn-search-address');
@@ -257,7 +245,7 @@
                 btn.disabled = true;
                 btn.textContent = 'Mencari...';
                 try {
-                    if (!map) initMap(); // jaga-jaga kalau user cari sebelum map sempat init
+                    if (!map) initMap();
                     const results = await geocodeAddress(query);
                     if (!results || results.length === 0) {
                         alert('Alamat tidak ditemukan.');
@@ -280,7 +268,6 @@
                     btn.textContent = 'Cari';
                 }
             }
-
             const btnSearch = document.getElementById('btn-search-address');
             const inputSearch = document.getElementById('search-address');
             if (btnSearch) btnSearch.addEventListener('click', doSearch);
@@ -290,8 +277,6 @@
                     doSearch();
                 }
             });
-
-            // Bonus: kalau pakai Bootstrap collapse/modal/tab, re-layout saat ditampilkan
             document.addEventListener('shown.bs.collapse', () => map && setTimeout(() => map.invalidateSize(), 50));
             document.addEventListener('shown.bs.modal', () => map && setTimeout(() => map.invalidateSize(), 50));
             document.addEventListener('shown.bs.tab', () => map && setTimeout(() => map.invalidateSize(), 50));

@@ -50,4 +50,18 @@ class AttendanceController extends Controller
 
         return view('admin.attendance.index', compact('attendances', 'allUsers', 'userFilter', 'search'));
     }
+    public function destroy($id)
+    {
+        // dd($id);
+        $attendance = Attendance::findOrFail($id);
+        if ($attendance->clock_in_photo_url && Storage::disk('public')->exists($attendance->clock_in_photo_url)) {
+            Storage::disk('public')->delete($attendance->clock_in_photo_url);
+        }
+        if ($attendance->clock_out_photo_url && Storage::disk('public')->exists($attendance->clock_out_photo_url)) {
+            Storage::disk('public')->delete($attendance->clock_out_photo_url);
+        }
+        $attendance->delete();
+        // return redirect()->route('admin.attendance.index')->with('success', 'Attendance record deleted successfully.');
+        return redirect()->back()->with('success', 'Presensi berhasil dihapus.');
+    }
 }

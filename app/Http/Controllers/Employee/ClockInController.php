@@ -44,31 +44,24 @@ class ClockInController extends Controller
             'clock_in_longitude' => 'required|numeric',
             'clock_in_photo'     => 'required|string',
         ]);
-
         $user = auth()->user();
         $location = Location::findOrFail($request->input('location_id'));
-
-        // radius bisa ambil dari DB; fallback 50m
         $radius = $location->radius_meters ?? 50;
-
         $distance = $this->calculateDistance(
             $request->input('clock_in_latitude'),
             $request->input('clock_in_longitude'),
             $location->latitude,
             $location->longitude
         );
-
         if ($distance > $radius) {
             return back()->with('error', 'Clock-in ditolak! Di luar radius kantor (' . round($distance, 2) . ' m).');
         }
-
         $photoPath = $this->saveBase64ImageToAttendancePath(
             $request->clock_in_photo,
             $user->user_id,
             'clockin',
             disk: 'public'
         );
-
         Attendance::create([
             'attendance_id'       => Str::uuid(),
             'user_id'             => $user->user_id,
@@ -79,7 +72,6 @@ class ClockInController extends Controller
             'clock_in_photo_url'  => $photoPath,
             'created_by'          => $user->user_id,
         ]);
-
         return redirect()->route('employee.clock.clockin')->with('success', 'Clock In successful');
     }
     private function saveBase64ImageToAttendancePath(string $dataUrl, string $userId, string $type = 'clockin', string $disk = 'public'): string
@@ -87,17 +79,14 @@ class ClockInController extends Controller
         if (!str_starts_with($dataUrl, 'data:')) {
             throw new \InvalidArgumentException('Invalid data URL');
         }
-
         [$meta, $content] = explode(',', $dataUrl, 2);
         preg_match('#data:(image/\w+);base64#', $meta, $m);
         $mime = $m[1] ?? 'image/png';
         $ext  = str_contains($mime, 'jpeg') ? 'jpg' : explode('/', $mime)[1];
-
         $binary = base64_decode($content);
         if ($binary === false) {
             throw new \RuntimeException('Gagal decode gambar');
         }
-
         $now = now();
         $dir = sprintf('attendance/%s/%s', $userId, $now->format('Y/m/d'));
         $filename = sprintf('%s-%s.%s', $type, $now->format('Hisv'), $ext); // Hisv = jammenitdetik+millis
@@ -107,7 +96,6 @@ class ClockInController extends Controller
             'visibility' => 'private',
             'ContentType' => $mime,
         ]);
-
         return $path;
     }
 

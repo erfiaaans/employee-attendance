@@ -16,6 +16,7 @@ use App\Http\Controllers\Employee\EmployeeAttendance;
 use App\Http\Middleware\Employee;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Employee\EmployeeAttendanceController;
+use App\Http\Controllers\DashboardController;
 
 Route::get('/', [LoginController::class, 'showLoginForm'])->name('index');
 
@@ -25,7 +26,19 @@ Auth::routes();
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 
 Route::group(['namespace' => '', 'prefix' => 'admin',  'middleware' => ['auth', 'admin']], function () {
-    Route::get('dashboard', [AdminController::class, 'adminGate'])->name('admin.dashboard');
+    Route::get('dashboardadmin', [AdminController::class, 'adminGate'])->name('admin.dashboard');
+    Route::get('dashboard', [AdminController::class, 'index'])->name('admin.index');
+    Route::get('dashboard/stats', function () {
+        $today = now()->toDateString();
+        return response()->json([
+            'totalEmployees'  => \App\Models\User::count(),
+            'totalLocations'  => \App\Models\Location::count(),
+            'totalAttendance' => \App\Models\Attendance::count(),
+            'todayAttendance' => \App\Models\Attendance::whereDate('clock_in_time', $today)
+                ->distinct('user_id')->count('user_id'),
+        ]);
+    })->middleware('auth')->name('admin.dashboard.stats');
+
 
     Route::get('location', [LocationController::class, 'index'])->name('admin.location');
     Route::get('location/{id}', [LocationController::class, 'index'])->name('admin.location.edit');
@@ -40,6 +53,7 @@ Route::group(['namespace' => '', 'prefix' => 'admin',  'middleware' => ['auth', 
     Route::get('user/{id}', [UserController::class, 'index'])->name('admin.user.edit');
 
     Route::get('attendance', [AttendanceController::class, 'index'])->name('admin.attendance');
+    Route::delete('attendance/{id}', [AttendanceController::class, 'destroy'])->name('admin.attendance.destroy');
 
     Route::get('profile', [ProfileController::class, 'profile'])->name('admin.profile.index');
     Route::put('profile/photo/{id}', [ProfileController::class, 'updatePhoto'])->name('admin.profile.upload_photo');
