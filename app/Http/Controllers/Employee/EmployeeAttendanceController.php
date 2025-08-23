@@ -20,7 +20,7 @@ class EmployeeAttendanceController extends Controller
                 $query->whereDate('clock_in_time', 'like', "%{$search}%")
                     ->orWhereTime('clock_in_time', 'like', "%{$search}%");
             })
-            ->orderBy('clock_in_time')
+            ->orderBy('clock_in_time', 'desc')
             ->get();
 
         $attendances = $attendancesRaw->groupBy(function ($item) {

@@ -44,35 +44,78 @@ class ClockInController extends Controller
             'clock_in_longitude' => 'required|numeric',
             'clock_in_photo'     => 'required|string',
         ]);
-        $user = auth()->user();
+
+        $user     = auth()->user();
         $location = Location::findOrFail($request->input('location_id'));
-        $radius = $location->radius_meters ?? 50;
+
+        if (is_null($location->latitude) || is_null($location->longitude)) {
+            return back()->with('error', 'Koordinat kantor belum diatur.');
+        }
+
+        $radius = $location->radius_meters ?? $location->radius ?? 50;
+
         $distance = $this->calculateDistance(
-            $request->input('clock_in_latitude'),
-            $request->input('clock_in_longitude'),
-            $location->latitude,
-            $location->longitude
+            (float) $request->input('clock_in_latitude'),
+            (float) $request->input('clock_in_longitude'),
+            (float) $location->latitude,
+            (float) $location->longitude
         );
+
         if ($distance > $radius) {
             return back()->with('error', 'Clock-in ditolak! Di luar radius kantor (' . round($distance, 2) . ' m).');
         }
+
         $photoPath = $this->saveBase64ImageToAttendancePath(
             $request->clock_in_photo,
             $user->user_id,
             'clockin',
             disk: 'public'
         );
-        Attendance::create([
-            'attendance_id'       => Str::uuid(),
-            'user_id'             => $user->user_id,
-            'location_id'         => $request->input('location_id'),
-            'clock_in_time'       => now(),
-            'clock_in_latitude'   => $request->input('clock_in_latitude'),
-            'clock_in_longitude'  => $request->input('clock_in_longitude'),
-            'clock_in_photo_url'  => $photoPath,
-            'created_by'          => $user->user_id,
-        ]);
-        return redirect()->route('employee.clock.clockin')->with('success', 'Clock In successful');
+
+        $tz    = config('app.timezone', 'Asia/Jakarta');
+        $start = now($tz)->startOfDay();
+        $end   = now($tz)->endOfDay();
+
+        $alreadyClockInToday = Attendance::query()
+            ->where('user_id', $user->user_id)
+            ->whereNotNull('clock_in_time')
+            ->whereBetween('clock_in_time', [$start, $end])
+            ->exists();
+
+        if ($alreadyClockInToday) {
+            return back()->with('error', 'Kamu sudah melakukan Clock In hari ini.');
+        }
+
+        $openRowToday = Attendance::query()
+            ->where('user_id', $user->user_id)
+            ->whereNull('clock_in_time')
+            ->whereBetween('created_at', [$start, $end])
+            ->orderByDesc('created_at')
+            ->first();
+
+        if ($openRowToday) {
+            $openRowToday->update([
+                'location_id'        => $request->input('location_id'),
+                'clock_in_time'      => now(),
+                'clock_in_latitude'  => (float) $request->input('clock_in_latitude'),
+                'clock_in_longitude' => (float) $request->input('clock_in_longitude'),
+                'clock_in_photo_url' => $photoPath,
+                'updated_by'        => $user->user_id ?? $user->id ?? null,
+            ]);
+        } else {
+            Attendance::create([
+                'attendance_id'       => (string) \Illuminate\Support\Str::uuid(),
+                'user_id'             => $user->user_id,
+                'location_id'         => $request->input('location_id'),
+                'clock_in_time'       => now(),
+                'clock_in_latitude'   => (float) $request->input('clock_in_latitude'),
+                'clock_in_longitude'  => (float) $request->input('clock_in_longitude'),
+                'clock_in_photo_url'  => $photoPath,
+                'created_by'          => $user->user_id ?? $user->id ?? null,
+            ]);
+        }
+
+        return redirect()->route('employee.clock.clockin')->with('success', 'Clock In berhasil.');
     }
     private function saveBase64ImageToAttendancePath(string $dataUrl, string $userId, string $type = 'clockin', string $disk = 'public'): string
     {

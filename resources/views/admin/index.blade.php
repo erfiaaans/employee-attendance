@@ -2,14 +2,6 @@
 @push('styles')
     {{-- <link rel="stylesheet" href="{{ asset('css/dashboardStyle.css') }}"> --}}
 @endpush
-@php
-    $stats = $stats ?? [
-        'totalEmployees' => 0,
-        'totalLocations' => 0,
-        'totalAttendance' => 0,
-        'todayAttendance' => 0,
-    ];
-@endphp
 @section('content')
     <div class="container-xxl flex-grow-1 container-p-y">
         <h4 class="py-3 mb-4">
@@ -110,7 +102,7 @@
                                             </div>
                                             <div class="user-progress">
                                                 <h6 id="stat-total-employees" class="mb-0">
-                                                    {{ number_format($stats['totalEmployees']) }}</h6>
+                                                    {{ number_format($stats->totalEmployees) }}</h6>
                                             </div>
                                         </div>
                                     </li>
@@ -123,11 +115,11 @@
                                         <div
                                             class="d-flex w-100 flex-wrap align-items-center justify-content-between gap-2">
                                             <div class="me-2">
-                                                <h6 class="mb-0">Total Lokasi Kantor Onmeso</h6>
+                                                <h6 class="mb-0">Total Lokasi Kantor</h6>
                                             </div>
                                             <div class="user-progress">
                                                 <h6 id="stat-total-locations" class="mb-0">
-                                                    {{ number_format($stats['totalLocations']) }}</h6>
+                                                    {{ number_format($stats->totalLocations) }}</h6>
                                             </div>
                                         </div>
                                     </li>
@@ -144,7 +136,7 @@
                                             </div>
                                             <div class="user-progress">
                                                 <h6 id="stat-total-attendance" class="mb-0">
-                                                    {{ number_format($stats['totalAttendance']) }}</h6>
+                                                    {{ number_format($stats->totalAttendances) }}</h6>
                                             </div>
                                         </div>
                                     </li>
@@ -161,7 +153,7 @@
                                             </div>
                                             <div class="user-progress">
                                                 <h6 id="stat-today-attendance" class="mb-0">
-                                                    {{ number_format($stats['todayAttendance']) }}</h6>
+                                                    {{ number_format($stats->todayAttendanceBoth) }}</h6>
                                             </div>
                                         </div>
                                     </li>
@@ -197,11 +189,11 @@
                                         <div
                                             class="d-flex w-100 flex-wrap align-items-center justify-content-between gap-2">
                                             <div class="me-2">
-                                                <h6 class="mb-0">Total Karyawan Yang Sudah Melakukan Clock In</h6>
+                                                <h6 class="mb-0">Karyawan Clock In</h6>
                                             </div>
                                             <div class="user-progress">
                                                 <h6 id="stat-total-employees" class="mb-0">
-                                                    {{ number_format($stats['totalEmployees']) }}</h6>
+                                                    {{ number_format($stats->todayClockInOnly) }}</h6>
                                             </div>
                                         </div>
                                     </li>
@@ -214,48 +206,14 @@
                                         <div
                                             class="d-flex w-100 flex-wrap align-items-center justify-content-between gap-2">
                                             <div class="me-2">
-                                                <h6 class="mb-0">Total Karyawan Yang Sudah Melakukan Clock Out</h6>
+                                                <h6 class="mb-0">Karyawan Clock Out</h6>
                                             </div>
                                             <div class="user-progress">
                                                 <h6 id="stat-total-locations" class="mb-0">
-                                                    {{ number_format($stats['totalLocations']) }}</h6>
+                                                    {{ number_format($stats->todayClockOutOnly) }}</h6>
                                             </div>
                                         </div>
                                     </li>
-                                    <li class="d-flex align-items-center mb-5">
-                                        <div class="avatar flex-shrink-0 me-3">
-                                            <span class="avatar-initial rounded bg-label-info">
-                                                <i class="icon-base bx bx-home-alt"></i>
-                                            </span>
-                                        </div>
-                                        <div
-                                            class="d-flex w-100 flex-wrap align-items-center justify-content-between gap-2">
-                                            <div class="me-2">
-                                                <h6 class="mb-0">Total Karyawan Yang Masuk Hari Ini</h6>
-                                            </div>
-                                            <div class="user-progress">
-                                                <h6 id="stat-total-attendance" class="mb-0">
-                                                    {{ number_format($stats['totalAttendance']) }}</h6>
-                                            </div>
-                                        </div>
-                                    </li>
-                                    {{-- <li class="d-flex align-items-center">
-                                        <div class="avatar flex-shrink-0 me-3">
-                                            <span class="avatar-initial rounded bg-label-secondary">
-                                                <i class="icon-base bx bx-football"></i>
-                                            </span>
-                                        </div>
-                                        <div
-                                            class="d-flex w-100 flex-wrap align-items-center justify-content-between gap-2">
-                                            <div class="me-2">
-                                                <h6 class="mb-0">Total Presensi Hari Ini</h6>
-                                            </div>
-                                            <div class="user-progress">
-                                                <h6 id="stat-today-attendance" class="mb-0">
-                                                    {{ number_format($stats['todayAttendance']) }}</h6>
-                                            </div>
-                                        </div>
-                                    </li> --}}
                                 </ul>
                             </div>
                         </div>
