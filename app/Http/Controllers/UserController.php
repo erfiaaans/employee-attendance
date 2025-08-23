@@ -7,6 +7,9 @@ use App\Enums\UserRole;
 use Illuminate\Http\Request;
 use App\Models\User;
 use App\Models\Location;
+use App\Models\OfficeLocationUser;
+use Illuminate\Database\QueryException;
+use Illuminate\Support\Facades\DB;
 
 class UserController extends Controller
 {
@@ -90,10 +93,35 @@ class UserController extends Controller
             return redirect()->back()->with('error', 'Terjadi kesalahan saat menyimpan data. Pastikan semua data diisi dengan benar.');
         }
     }
+
     public function destroy($id)
     {
-        $user = User::findOrFail($id);
-        $user->delete();
-        return redirect()->back()->with('success', 'Pegawai berhasil dihapus.');
+        $user = User::where('user_id', $id)->firstOrFail();
+
+        $hasAttendance = $user->attendances()->exists();
+        $hasOfficeLink = OfficeLocationUser::where('user_id', $user->user_id)->exists();
+
+        if ($hasAttendance || $hasOfficeLink) {
+            return redirect()->back()->with(
+                'error',
+                'Pegawai tidak bisa dihapus karena masih memiliki '
+                    . ($hasAttendance ? 'data kehadiran ' : '')
+                    . ($hasOfficeLink ? 'atau relasi lokasi kantor' : '')
+                    . '.'
+            );
+        }
+
+        try {
+            $user->delete();
+            return redirect()->back()->with('success', 'Pegawai berhasil dihapus.');
+        } catch (QueryException $e) {
+            if ($e->getCode() === '23000') {
+                return redirect()->back()->with(
+                    'error',
+                    'Pegawai tidak bisa dihapus karena masih direferensikan data lain.'
+                );
+            }
+            throw $e;
+        }
     }
 }

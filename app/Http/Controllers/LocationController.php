@@ -2,8 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Attendance;
 use Illuminate\Http\Request;
 use App\Models\Location;
+use App\Models\OfficeLocationUser;
+use Illuminate\Database\QueryException;
 
 class LocationController extends Controller
 {
@@ -77,8 +80,34 @@ class LocationController extends Controller
     }
     public function destroy($id)
     {
-        $location = Location::findOrFail($id);
-        $location->delete();
-        return redirect()->back()->with('success', 'Lokasi dihapus, data kehadiran tetap aman.');
+        $location = Location::where('location_id', $id)->firstOrFail();
+
+        $attendanceCount = Attendance::where('location_id', $location->location_id)->count();
+        $linkCount       = OfficeLocationUser::where('location_id', $location->location_id)->count();
+
+        if ($attendanceCount > 0 || $linkCount > 0) {
+            $parts = [];
+            if ($attendanceCount > 0) $parts[] = "{$attendanceCount} data kehadiran";
+            if ($linkCount > 0)       $parts[] = "{$linkCount} relasi user lokasi";
+            $reason = implode(' dan ', $parts);
+
+            return redirect()->back()->with(
+                'error',
+                "Lokasi tidak bisa dihapus karena masih dipakai oleh {$reason}."
+            );
+        }
+
+        try {
+            $location->delete();
+            return redirect()->back()->with('success', 'Lokasi dihapus, data kehadiran tetap aman.');
+        } catch (QueryException $e) {
+            if ($e->getCode() === '23000') {
+                return redirect()->back()->with(
+                    'error',
+                    'Lokasi tidak bisa dihapus karena masih direferensikan data lain.'
+                );
+            }
+            throw $e;
+        }
     }
 }

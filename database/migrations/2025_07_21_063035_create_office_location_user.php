@@ -16,8 +16,8 @@ return new class extends Migration
             $table->string('location_id', 36);
             $table->string('user_id', 36);
 
-            $table->foreign('location_id')->references('location_id')->on('locations')->onDelete('cascade');
-            $table->foreign('user_id')->references('user_id')->on('users')->onDelete('cascade');
+            $table->foreign('location_id')->references('location_id')->on('locations')->onDelete('no action');
+            $table->foreign('user_id')->references('user_id')->on('users')->onDelete('no action');
             $table->unique(['location_id', 'user_id']);
 
             $table->string('created_by', 36)->nullable();

@@ -13,7 +13,7 @@ return new class extends Migration
         Schema::create('users', function (Blueprint $table) {
             $table->string('user_id', 36)->primary();
             $table->string('location_id', 36)->nullable();
-            $table->foreign('location_id')->references('location_id')->on('locations')->onDelete('set null');
+            $table->foreign('location_id')->references('location_id')->on('locations')->onDelete('no action');
 
             $table->string('name', 100);
             $table->enum('role', UserRole::values())->default('employee');

@@ -83,6 +83,16 @@ class User extends Authenticatable
         );
     }
 
+    public function attendances()
+    {
+        return $this->hasMany(Attendance::class, 'user_id', 'user_id');
+    }
+
+    public function officeLocationUsers()
+    {
+        return $this->hasMany(OfficeLocationUser::class, 'user_id', 'user_id');
+    }
+
     public function setLocationIdAttribute($value)
     {
         if (!Location::where('location_id', $value)->exists()) {

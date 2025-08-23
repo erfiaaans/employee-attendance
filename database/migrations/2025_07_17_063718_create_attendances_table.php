@@ -26,7 +26,7 @@ return new class extends Migration
             $table->decimal('clock_out_longitude', 11, 8)->nullable();
 
             $table->foreign('user_id')->references('user_id')->on('users');
-            $table->foreign('location_id')->references('location_id')->on('locations')->onDelete('set null');
+            $table->foreign('location_id')->references('location_id')->on('locations')->onDelete('no action');
 
             $table->string('created_by', 36)->nullable();
             $table->string('updated_by', 36)->nullable();
