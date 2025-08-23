@@ -19,39 +19,48 @@
                                         <input type="text" name="search" class="form-control me-2"
                                             style="max-width: 250px;" placeholder="Cari nama, jabatan, kantor, tanggal..."
                                             value="{{ request('search') }}">
-
                                         @if (request('filter'))
                                             <input type="hidden" name="filter" value="{{ request('filter') }}">
                                         @endif
-                                        <button type="submit" class="btn btn-light btn-sm">Cari</button>
-                                        <div class="dropdown">
-                                            <button class="btn btn-secondary btn-sm dropdown-toggle" type="button"
-                                                data-bs-toggle="dropdown" aria-expanded="false">
-                                                Pilih Pegawai
-                                            </button>
-                                            <ul class="dropdown-menu">
-                                                @foreach ($allUsers as $user)
-                                                    <li>
-                                                        <a class="dropdown-item"
-                                                            href="{{ route('admin.attendance', ['filter' => $user->name, 'search' => request('search')]) }}">
-                                                            {{ $user->name }}
-                                                        </a>
-                                                    </li>
-                                                @endforeach
-                                                @if (request('filter'))
-                                                    <li>
-                                                        <hr class="dropdown-divider">
-                                                    </li>
-                                                    <li>
-                                                        <a class="dropdown-item text-danger"
-                                                            href="{{ route('admin.attendance') }}">
-                                                            Hapus Filter
-                                                        </a>
-                                                    </li>
-                                                @endif
-                                            </ul>
-                                        </div>
+                                        <button type="submit" class="btn btn-light">Cari</button>
                                     </div>
+                                </div>
+                            </div>
+                        </form>
+                        <form action="{{ route('admin.attendance.exportByPeriode') }}" method="GET" class="my-3">
+                            <div class="row g-2 align-items-end">
+                                <div class="col-md-3">
+                                    <label for="start_date_export" class="form-label">Tanggal Mulai</label>
+                                    <input type="date" name="start_date" id="start_date_export" class="form-control"
+                                        value="{{ request('start_date') }}" required>
+                                </div>
+                                <div class="col-md-3">
+                                    <label for="end_date_export" class="form-label">Tanggal Selesai</label>
+                                    <input type="date" name="end_date" id="end_date_export" class="form-control"
+                                        value="{{ request('end_date') }}" required>
+                                </div>
+                                <div class="col-md-3">
+                                    <button type="submit" class="btn btn-success">
+                                        <i class="bx bx-download"></i> Export Periode
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                        <form action="{{ route('admin.attendance.destroyByPeriode') }}" method="POST" class="my-3">
+                            @csrf
+                            @method('DELETE')
+                            <div class="row g-2 align-items-end">
+                                <div class="col-md-3">
+                                    <label for="start_date" class="form-label">Tanggal Mulai</label>
+                                    <input type="date" name="start_date" id="start_date" class="form-control" required>
+                                </div>
+                                <div class="col-md-3">
+                                    <label for="end_date" class="form-label">Tanggal Selesai</label>
+                                    <input type="date" name="end_date" id="end_date" class="form-control" required>
+                                </div>
+                                <div class="col-md-3">
+                                    <button type="submit" class="btn btn-icn btn-danger swalDeleteData"><i
+                                            class="tf-icons bx bx-trash text-white"></i>Hapus Berdasarkan Periode</button>
                                 </div>
                             </div>
                         </form>

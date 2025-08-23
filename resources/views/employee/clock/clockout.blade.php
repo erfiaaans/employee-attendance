@@ -20,46 +20,59 @@
                 Anda sudah melakukan Clock Out hari ini.
             </div>
         @else
-            <div class="card mb-3" style="max-width: 1200px;">
-                <div class="row g-0">
-                    <div class="col-md-6 d-flex flex-column justify-content-center p-4">
-                        <label class="form-label">Lokasi di Map</label>
-                        <div id="map" style="height: 400px;"></div>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="card mb-3 h-100">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0">{{ 'Lokasi di Maps' }}</h5>
+                        </div>
+                        <div id="map" style="height: 400px; width: 100%;"></div>
                     </div>
-                    <div class="col-md-6 p-4">
-                        <form action="{{ route('employee.clock.clockout.store') }}" method="POST">
-                            @csrf
-                            <input type="hidden" id="location_id" name="location_id">
-                            <input type="hidden" id="clock_out_photo" name="clock_out_photo">
-                            <input type="hidden" id="clock_out_latitude" name="clock_out_latitude">
-                            <input type="hidden" id="clock_out_longitude" name="clock_out_longitude">
-                            <div class="mb-3">
-                                <label class="form-label">Nama Pegawai</label>
-                                <input type="text" class="form-control" value="{{ auth()->user()->name }}" disabled>
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label">Lokasi Saat Ini</label>
-                                <input type="text" id="latitude" class="form-control mb-2" placeholder="Latitude"
-                                    readonly>
-                                <input type="text" id="longitude" class="form-control" placeholder="Longitude" readonly>
-                                <div id="radiusInfo" class="form-text mt-1"></div>
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label">Ambil Foto Clock Out</label>
-                                <video id="camera" width="100%" height="auto" autoplay playsinline class="mb-2"
-                                    style="border-radius: 10px; border: 1px solid #ccc;"></video>
-                                <canvas id="snapshot" style="display:none;"></canvas>
-                                <div class="mt-2 d-flex gap-2">
-                                    <button type="button" class="btn btn-secondary mt-2" onclick="takeSnapshot()">Ambil
-                                        Foto</button>
-                                    <button type="button" class="btn btn-outline-danger mt-2 ms-2"
-                                        onclick="resetPhoto()">Batal</button>
+                </div>
+                <div class="col-md-6">
+                    <div class="card mb-3 h-100">
+                        <div class="card-body p-4">
+                            <form action="{{ route('employee.clock.clockout.store') }}" method="POST">
+                                @csrf
+                                <input type="hidden" id="location_id" name="location_id">
+                                <input type="hidden" id="clock_out_photo" name="clock_out_photo">
+                                <input type="hidden" id="clock_out_latitude" name="clock_out_latitude">
+                                <input type="hidden" id="clock_out_longitude" name="clock_out_longitude">
+                                <div class="mb-3">
+                                    <label class="form-label">Nama Pegawai</label>
+                                    <input type="text" class="form-control" value="{{ auth()->user()->name }}" disabled>
                                 </div>
-                                <img id="photo_preview" src="#" alt="Preview" class="img-thumbnail mt-2"
-                                    style="display:none;" />
-                            </div>
-                            <button type="submit" class="btn btn-primary mt-3" id="submitBtn" disabled>Clock Out</button>
-                        </form>
+                                <div class="mb-3">
+                                    <label class="form-label">Jabatan</label>
+                                    <input type="text" class="form-control" value="{{ auth()->user()->position }}"
+                                        disabled>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Lokasi Saat Ini</label>
+                                    <input type="text" id="latitude" class="form-control mb-2" placeholder="Latitude"
+                                        readonly>
+                                    <input type="text" id="longitude" class="form-control" placeholder="Longitude"
+                                        readonly>
+                                    <div id="radiusInfo" class="form-text mt-1"></div>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Ambil Foto Clock Out</label>
+                                    <video id="camera" width="100%" height="auto" autoplay playsinline class="mb-2"
+                                        style="border-radius: 10px; border: 1px solid #ccc;"></video>
+                                    <canvas id="snapshot" style="display:none;"></canvas>
+                                    <div class="mt-2 d-flex gap-2">
+                                        <button type="button" class="btn btn-secondary mt-2" onclick="takeSnapshot()">Ambil
+                                            Foto</button>
+                                        <button type="button" class="btn btn-outline-danger mt-2 ms-2"
+                                            onclick="resetPhoto()">Batal</button>
+                                    </div>
+                                    <img id="photo_preview" src="#" alt="Preview" class="img-thumbnail mt-2"
+                                        style="display:none;" />
+                                </div>
+                                <button type="submit" class="btn btn-primary mt-3" id="submitBtn" disabled>Clock
+                                    Out</button>
+                            </form>
+                        </div>
                     </div>
                 </div>
             </div>

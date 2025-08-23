@@ -39,6 +39,11 @@ class Location extends Model
         'radius' => 'integer'
     ];
 
+    public function attendances()
+    {
+        return $this->hasMany(Attendance::class, 'location_id', 'location_id');
+    }
+
     public function creator()
     {
         return $this->belongsTo(User::class, 'created_by', 'user_id')->withDefault();

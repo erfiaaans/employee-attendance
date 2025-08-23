@@ -28,17 +28,17 @@ Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name
 Route::group(['namespace' => '', 'prefix' => 'admin',  'middleware' => ['auth', 'admin']], function () {
     Route::get('dashboardadmin', [AdminController::class, 'adminGate'])->name('admin.dashboard');
     Route::get('dashboard', [AdminController::class, 'index'])->name('admin.index');
-    Route::get('dashboard/stats', function () {
-        $today = now()->toDateString();
-        return response()->json([
-            'totalEmployees'  => \App\Models\User::count(),
-            'totalLocations'  => \App\Models\Location::count(),
-            'totalAttendance' => \App\Models\Attendance::count(),
-            'todayAttendance' => \App\Models\Attendance::whereDate('clock_in_time', $today)
-                ->distinct('user_id')->count('user_id'),
-        ]);
-    })->middleware('auth')->name('admin.dashboard.stats');
-
+    // Route::get('dashboard/stats', function () {
+    //     $today = now()->toDateString();
+    //     return response()->json([
+    //         'totalEmployees'  => \App\Models\User::count(),
+    //         'totalLocations'  => \App\Models\Location::count(),
+    //         'totalAttendance' => \App\Models\Attendance::count(),
+    //         'todayAttendance' => \App\Models\Attendance::whereDate('clock_in_time', $today)
+    //             ->distinct('user_id')->count('user_id'),
+    //     ]);
+    // })->middleware('auth')->name('admin.dashboard.stats');
+    Route::get('dashboard/stats', [DashboardController::class, 'stats'])->name('admin.dashboard.stats');
 
     Route::get('location', [LocationController::class, 'index'])->name('admin.location');
     Route::get('location/{id}', [LocationController::class, 'index'])->name('admin.location.edit');
@@ -53,7 +53,10 @@ Route::group(['namespace' => '', 'prefix' => 'admin',  'middleware' => ['auth', 
     Route::get('user/{id}', [UserController::class, 'index'])->name('admin.user.edit');
 
     Route::get('attendance', [AttendanceController::class, 'index'])->name('admin.attendance');
-    Route::delete('attendance/{id}', [AttendanceController::class, 'destroy'])->name('admin.attendance.destroy');
+    Route::delete('attendance/delete-by-periode', [AttendanceController::class, 'destroyByPeriode'])->name('admin.attendance.destroyByPeriode');
+    Route::delete('attendance/{id}', [AttendanceController::class, 'destroy'])->whereUuid('id')
+        ->name('admin.attendance.destroy');
+    Route::get('attendance/export-by-periode', [AttendanceController::class, 'exportByPeriode'])->name('admin.attendance.exportByPeriode');
 
     Route::get('profile', [ProfileController::class, 'profile'])->name('admin.profile.index');
     Route::put('profile/photo/{id}', [ProfileController::class, 'updatePhoto'])->name('admin.profile.upload_photo');
@@ -65,8 +68,6 @@ Route::group(['namespace' => '', 'prefix' => 'admin',  'middleware' => ['auth', 
     Route::put('user-location/{id}', [UserLocationController::class, 'update'])->name('admin.userLocation.update');
     Route::delete('user-location/{id}', [UserLocationController::class, 'destroy'])->name('admin.userLocation.destroy');
 });
-
-
 Route::group(['namespace' => '', 'prefix' => 'employee',  'middleware' => ['auth', 'employee']], function () {
     Route::get('dashboard', [EmployeeController::class, 'employeeGate'])->name('employee.dashboard');
 

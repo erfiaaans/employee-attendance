@@ -100,7 +100,7 @@
                         <li class="menu-item">
                             <a href="{{ route('admin.location') }}" class="menu-link">
                                 <i class="menu-icon tf-icons bx bx-collection"></i>
-                                <div class="text-truncate" data-i18n="Basic">Location</div>
+                                <div class="text-truncate" data-i18n="Lokasi-Kantor">Lokasi Kantor</div>
                             </a>
                         </li>
                         <li class="menu-item">
@@ -112,13 +112,13 @@
                         <li class="menu-item">
                             <a href="{{ route('admin.userLocation.index') }}" class="menu-link">
                                 <i class="menu-icon tf-icons bx bx-store"></i>
-                                <div class="text-truncate" data-i18n="Daftar-Pegawai">Lokasi User</div>
+                                <div class="text-truncate" data-i18n="Lokasi-Pegawai">Lokasi Pegawai</div>
                             </a>
                         </li>
                         <li class="menu-item">
                             <a href="{{ route('admin.attendance') }}" class="menu-link">
                                 <i class="menu-icon tf-icons bx bx-detail"></i>
-                                <div class="text-truncate" data-i18n="Daftar-Pegawai">Riwayat Absensi</div>
+                                <div class="text-truncate" data-i18n="Riwayat-Absensi">Riwayat Absensi</div>
                             </a>
                         </li>
                     </ul>

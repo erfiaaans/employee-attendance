@@ -46,14 +46,13 @@
                     value="{{ old('telephone', $user->telephone ?? '') }}" />
             </div>
         </div>
-        {{-- <div class="col-md-6">
+        <div class="col-md-6">
             <label for="office-name" class="form-label">Kantor</label>
             <input class="form-control" type="text" id="office-name" name="office-name"
-                placeholder="Onmeso Madiun" />
-        </div> --}}
+                value="{{ old('email', $user->office_name ?? '') }}" />
+        </div>
         <div class="mt-4">
             <button type="submit" class="btn btn-primary me-3 mb-3"> Update</button>
-
         </div>
     </div>
 </form>
