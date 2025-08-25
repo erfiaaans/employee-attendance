@@ -27,6 +27,8 @@ Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name
 
 Route::group(['namespace' => '', 'prefix' => 'admin',  'middleware' => ['auth', 'admin']], function () {
     Route::get('dashboardadmin', [AdminController::class, 'adminGate'])->name('admin.dashboard');
+    Route::get('dashboard/stats', [AdminController::class, 'adminStats'])->name('admin.dashboard.stats');
+
     Route::get('dashboard', [AdminController::class, 'index'])->name('admin.index');
     // Route::get('dashboard/stats', function () {
     //     $today = now()->toDateString();
@@ -38,7 +40,7 @@ Route::group(['namespace' => '', 'prefix' => 'admin',  'middleware' => ['auth', 
     //             ->distinct('user_id')->count('user_id'),
     //     ]);
     // })->middleware('auth')->name('admin.dashboard.stats');
-    Route::get('dashboard/stats', [DashboardController::class, 'stats'])->name('admin.dashboard.stats');
+    // Route::get('dashboard/stats', [DashboardController::class, 'stats'])->name('admin.dashboard.stats');
 
     Route::get('location', [LocationController::class, 'index'])->name('admin.location');
     Route::get('location/{id}', [LocationController::class, 'index'])->name('admin.location.edit');

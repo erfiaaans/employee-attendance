@@ -16,9 +16,11 @@ class ClockInController extends Controller
     public function clockIn()
     {
         $user = auth()->user();
+
         $alreadyClockedIn = Attendance::where('user_id', $user->user_id)
             ->whereDate('clock_in_time', now()->toDateString())
             ->exists();
+
         $locations = OfficeLocationUser::with('locations')
             ->where('user_id', $user->user_id)
             ->get()
@@ -26,10 +28,14 @@ class ClockInController extends Controller
             ->filter()
             ->values();
         if ($locations->isEmpty()) {
-            return redirect()
-                ->route('employee.clock.clockin')
-                ->withErrors('Lokasi untuk user ini tidak ditemukan.');
+            session()->now('error', 'Lokasi untuk user ini tidak ditemukan. Hubungi admin untuk mengatur lokasi.');
+
+            return view('employee.clock.clockin', [
+                'locations' => collect(), // kosongkan biar aman
+                'alreadyClockedIn' => $alreadyClockedIn,
+            ]);
         }
+
 
         return view('employee.clock.clockin', [
             'locations' => $locations,

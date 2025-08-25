@@ -26,9 +26,12 @@ class ClockOutController extends Controller
             ->filter()
             ->values();
         if ($locations->isEmpty()) {
-            return redirect()
-                ->route('employee.clock.clockout')
-                ->withErrors('Lokasi untuk user ini tidak ditemukan.');
+            session()->now('error', 'Lokasi untuk user ini tidak ditemukan. Hubungi admin untuk mengatur lokasi.');
+
+            return view('employee.clock.clockout', [
+                'locations' => $locations,
+                'alreadyClockedOut' => $alreadyClockedOut,
+            ]);
         }
         return view('employee.clock.clockout', [
             'locations' => $locations,

@@ -165,7 +165,7 @@ class DummySeeder extends Seeder
         ];
 
         $startDate = Carbon::create(2025, 6, 1);
-        $endDate = Carbon::create(2025, 7, 31);
+        $endDate = Carbon::create(2025, 8, 23);
 
         while ($startDate->lte($endDate)) {
             if ($startDate->isWeekday()) {
