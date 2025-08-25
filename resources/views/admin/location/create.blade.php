@@ -45,6 +45,7 @@
                                 </span>
                             @enderror
                         </div>
+
                         <div class="col-md-4">
                             <label class="form-label">Latitude</label>
                             <input type="text" name="latitude"
@@ -78,6 +79,49 @@
                                 </span>
                             @enderror
                         </div>
+
+                        @php
+                            $ci = old('check_in_time', data_get($editLocation, 'check_in_time'));
+                            $co = old('check_out_time', data_get($editLocation, 'check_out_time'));
+                            $normalizeToHHMM = function ($v) {
+                                if ($v instanceof \Carbon\CarbonInterface) {
+                                    return $v->format('H:i');
+                                }
+                                if (is_string($v)) {
+                                    return substr($v, 0, 5);
+                                }
+                                return '';
+                            };
+
+                            $ci = $normalizeToHHMM($ci);
+                            $co = $normalizeToHHMM($co);
+                        @endphp
+
+                        <div class="col-md-4">
+                            <label class="form-label">Jam Check-In</label>
+                            <input type="time" name="check_in_time" step="60"
+                                class="form-control @error('check_in_time') is-invalid @enderror"
+                                value="{{ $ci }}">
+                            @error('check_in_time')
+                                <span class="invalid-feedback" role="alert">
+                                    <strong>{{ $message }}</strong>
+                                </span>
+                            @enderror
+                        </div>
+
+                        <div class="col-md-4">
+                            <label class="form-label">Jam Check-Out</label>
+                            <input type="time" name="check_out_time" step="60"
+                                class="form-control @error('check_out_time') is-invalid @enderror"
+                                value="{{ $co }}">
+                            @error('check_out_time')
+                                <span class="invalid-feedback" role="alert">
+                                    <strong>{{ $message }}</strong>
+                                </span>
+                            @enderror
+                        </div>
+
+
                         <div class="col-md-12">
                             <div class="d-flex justify-content-between align-items-center mb-2">
                                 <label class="form-label mb-0">Pilih Lokasi di Map</label>

@@ -58,6 +58,9 @@
                                         <th>Latitude</th>
                                         <th>Longitude</th>
                                         <th style="width: 50px;">Radius</th>
+                                        {{-- NEW: kolom waktu --}}
+                                        <th style="width: 85px;">Check In</th>
+                                        <th style="width: 85px;">Check Out</th>
                                         <th style="width: 110px;">Aksi</th>
                                     </thead>
                                     <tbody class="table-border-bottom-0">
@@ -70,6 +73,13 @@
                                                 <td>{{ $location->latitude }}</td>
                                                 <td>{{ $location->longitude }}</td>
                                                 <td>{{ $location->radius }}</td>
+                                                <td>
+                                                    {{ $location->check_in_time ? \Carbon\Carbon::parse($location->check_in_time)->format('H:i') : '-' }}
+                                                </td>
+                                                <td>
+                                                    {{ $location->check_out_time ? \Carbon\Carbon::parse($location->check_out_time)->format('H:i') : '-' }}
+                                                </td>
+
                                                 <td class="text-center">
                                                     <div class="btn-group">
                                                         <form
@@ -90,7 +100,7 @@
                                             </tr>
                                         @empty
                                             <tr>
-                                                <td colspan="8" class="text-center">Data tidak tersedia</td>
+                                                <td colspan="10" class="text-center">Data tidak tersedia</td>
                                             </tr>
                                         @endforelse
                                     </tbody>

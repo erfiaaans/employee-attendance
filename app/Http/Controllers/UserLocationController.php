@@ -41,7 +41,7 @@ class UserLocationController extends Controller
         // dd($request->all());
         $request->validate([
             'user_id' => 'required|exists:users,user_id',
-            'location_id' => 'required|exists:Locations,location_id',
+            'location_id' => 'required|exists:locations,location_id',
         ]);
 
         OfficeLocationUser::create([
@@ -53,13 +53,31 @@ class UserLocationController extends Controller
         ]);
         return redirect()->route('admin.userLocation.index')->with('success', 'Lokasi pegawai berhasil ditambahkan.');
     }
-    public function edit($id)
+    public function edit(Request $request, $id)
     {
+        $usersLocations =  OfficeLocationUser::with(['user', 'locations'])
+            ->when($request->search, function ($query, $search) {
+                $query->where(function ($q) use ($search) {
+                    $q->whereHas('user', function ($qu) use ($search) {
+                        $qu->where('name', 'like', "%{$search}%")
+                            ->orWhere('position', 'like', "%{$search}%");
+                    })
+                        ->orWhereHas('locations', function ($ql) use ($search) {
+                            $ql->where('office_name', 'like', "%{$search}%");
+                        });
+                });
+            })
+            // ->orderBy(User::select('name')->whereColumn('users.user_id', 'office_location_user.user_id'))
+            ->join('users', 'users.user_id', '=', 'office_location_user.user_id')
+            ->orderBy('users.name')
+            ->select('office_location_user.*')
+            ->paginate(10);
+
         $officeLocationUser = OfficeLocationUser::findOrFail($id);
         $users = User::orderBy('name')->get();
         $locations = Location::orderBy('office_name')->get();
 
-        return view('admin.userLocation.index', compact('officeLocationUser', 'users', 'locations'));
+        return view('admin.userLocation.index', compact('officeLocationUser', 'users', 'locations', 'usersLocations'));
     }
     public function update(Request $request, $id)
     {
