@@ -67,9 +67,9 @@ class ClockInController extends Controller
             (float) $location->longitude
         );
 
-        if ($distance > $radius) {
-            return back()->with('error', 'Clock-in ditolak! Di luar radius kantor (' . round($distance, 2) . ' m).');
-        }
+        // if ($distance > $radius) {
+        //     return back()->with('error', 'Clock-in ditolak! Di luar radius kantor (' . round($distance, 2) . ' m).');
+        // }
 
         $photoPath = $this->saveBase64ImageToAttendancePath(
             $request->clock_in_photo,

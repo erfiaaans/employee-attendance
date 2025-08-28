@@ -7,6 +7,7 @@
         }
     </style>
 @endsection
+
 @section('content')
     <div class="container mt-4">
         <h4 class="py-3 mb-4">
@@ -16,6 +17,8 @@
         @if ($alreadyClockedIn)
             <div class="alert alert-info">Anda sudah melakukan Clock In hari ini.</div>
         @else
+            <div id="radiusAlert" class="alert alert-warning d-none"></div>
+
             <div class="row">
                 <div class="col-md-6">
                     <div class="card mb-3 h-100">
@@ -25,6 +28,7 @@
                         <div id="map" style="height: 400px; width: 100%;"></div>
                     </div>
                 </div>
+
                 <div class="col-md-6">
                     <div class="card mb-3 h-100">
                         <div class="card-body p-4">
@@ -34,23 +38,29 @@
                                 <input type="hidden" id="clock_in_photo" name="clock_in_photo">
                                 <input type="hidden" id="clock_in_latitude" name="clock_in_latitude">
                                 <input type="hidden" id="clock_in_longitude" name="clock_in_longitude">
+                                <input type="hidden" id="outside_radius" name="outside_radius" value="0">
+                                <input type="hidden" id="distance_meters" name="distance_meters" value="">
+
                                 <div class="mb-3">
                                     <label class="form-label">Nama Pegawai</label>
                                     <input type="text" class="form-control" value="{{ auth()->user()->name }}" disabled>
                                 </div>
+
                                 <div class="mb-3">
                                     <label class="form-label">Jabatan</label>
                                     <input type="text" class="form-control" value="{{ auth()->user()->position }}"
                                         disabled>
                                 </div>
+
                                 <div class="mb-3">
                                     <label class="form-label">Lokasi Saat Ini</label>
                                     <input type="text" id="latitude" class="form-control mb-2" placeholder="Latitude"
-                                        readonly>
+                                        disabled>
                                     <input type="text" id="longitude" class="form-control" placeholder="Longitude"
-                                        readonly>
+                                        disabled>
                                     <div id="radiusInfo" class="form-text mt-1"></div>
                                 </div>
+
                                 <div class="mb-3">
                                     <label class="form-label">Ambil Foto Clock In</label>
                                     <video id="camera" width="100%" height="auto" autoplay playsinline class="mb-2"
@@ -65,6 +75,7 @@
                                     <img id="photo_preview" src="#" alt="Preview" class="img-thumbnail mt-2"
                                         style="display:none;" />
                                 </div>
+
                                 <button type="submit" class="btn btn-primary mt-3" id="submitBtn" disabled>Clock
                                     In</button>
                             </form>
@@ -75,6 +86,7 @@
         @endif
     </div>
 @endsection
+
 @section('scripts')
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     @php
@@ -85,13 +97,14 @@
                     'name' => $l->office_name ?? 'Lokasi',
                     'lat' => (float) $l->latitude,
                     'lng' => (float) $l->longitude,
-                    'radius' => (int) ($l->radius ?? 50),
+                    'radius' => (int) ($l->radius ?? ($l->radius_meters ?? 50)),
                 ];
             })
             ->values();
     @endphp
     <script>
         const offices = @json($officePayload);
+
         const RedIcon = new L.Icon({
             iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-red.png',
             shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
@@ -108,8 +121,10 @@
             popupAnchor: [1, -34],
             shadowSize: [41, 41]
         });
+
         const map = L.map('map').setView([0, 0], 15);
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+
         const bounds = [];
         const officeLayers = [];
         offices.forEach(o => {
@@ -132,17 +147,40 @@
         if (bounds.length) map.fitBounds(bounds, {
             padding: [30, 30]
         });
+
         let userMarker = null;
+        let hasGeolocation = false;
+        let hasPhoto = false;
+
+        const $latH = document.getElementById('clock_in_latitude');
+        const $lngH = document.getElementById('clock_in_longitude');
+        const $latT = document.getElementById('latitude');
+        const $lngT = document.getElementById('longitude');
+        const $locId = document.getElementById('location_id');
+        const $outside = document.getElementById('outside_radius');
+        const $distH = document.getElementById('distance_meters');
+        const $hint = document.getElementById('radiusInfo');
+        const $alert = document.getElementById('radiusAlert');
+        const $submit = document.getElementById('submitBtn');
+
+        function updateSubmitState() {
+            // Submit aktif kalau sudah punya lokasi & foto
+            $submit.disabled = !(hasGeolocation && hasPhoto);
+        }
 
         function setUserPosition(lat, lng) {
             if (userMarker) map.removeLayer(userMarker);
             userMarker = L.marker([lat, lng], {
                 icon: BlueIcon
             }).addTo(map).bindPopup('Lokasi Anda').openPopup();
-            document.getElementById('clock_in_latitude').value = lat;
-            document.getElementById('clock_in_longitude').value = lng;
-            document.getElementById('latitude').value = lat;
-            document.getElementById('longitude').value = lng;
+
+            $latH.value = lat;
+            $lngH.value = lng;
+            $latT.value = lat;
+            $lngT.value = lng;
+            hasGeolocation = true;
+            updateSubmitState();
+
             if (bounds.length) {
                 const all = bounds.concat([
                     [lat, lng]
@@ -153,51 +191,59 @@
             } else {
                 map.setView([lat, lng], 16);
             }
-            validateAgainstAllOffices(lat, lng);
+            evaluateAgainstOffices(lat, lng);
         }
 
-        function validateAgainstAllOffices(lat, lng) {
-            const btn = document.getElementById('submitBtn');
-            const hint = document.getElementById('radiusInfo');
-            let within = [];
-            offices.forEach(o => {
+        function evaluateAgainstOffices(lat, lng) {
+            if (!offices.length) {
+                $locId.value = '';
+                $outside.value = 0;
+                $distH.value = '';
+                $hint.textContent = 'Tidak ada lokasi terdaftar.';
+                $alert.classList.add('d-none');
+                return;
+            }
+
+            const distances = offices.map(o => {
                 const d = map.distance([lat, lng], [o.lat, o.lng]); // meter
-                if (d <= o.radius) within.push({
+                return {
                     id: o.id,
                     name: o.name,
-                    dist: d,
-                    radius: o.radius
-                });
-            });
-            if (within.length) {
-                within.sort((a, b) => a.dist - b.dist);
-                const chosen = within[0];
-                document.getElementById('location_id').value = chosen.id;
-                btn.disabled = false;
-                hint.textContent =
-                    `Di dalam radius: ${chosen.name} (~${Math.round(chosen.dist)} m, batas ${chosen.radius} m).`;
+                    radius: o.radius,
+                    d
+                };
+            }).sort((a, b) => a.d - b.d);
+
+            const nearest = distances[0];
+            $locId.value = nearest.id; // tetap isi lokasi terdekat
+            $distH.value = Math.round(nearest.d);
+
+            if (nearest.d <= nearest.radius) {
+                $outside.value = 0;
+                $hint.textContent =
+                    `Di dalam radius: ${nearest.name} (~${Math.round(nearest.d)} m, batas ${nearest.radius} m).`;
+                $alert.classList.add('d-none');
             } else {
-                document.getElementById('location_id').value = '';
-                btn.disabled = true;
-                if (offices.length) {
-                    const distances = offices.map(o => ({
-                        name: o.name,
-                        d: map.distance([lat, lng], [o.lat, o.lng]),
-                        r: o.radius
-                    }));
-                    distances.sort((a, b) => a.d - b.d);
-                    const nearest = distances[0];
-                    hint.textContent =
-                        `Di luar semua radius. Terdekat: ${nearest.name} ~${Math.round(nearest.d)} m (batas ${nearest.r} m).`;
-                } else {
-                    hint.textContent = 'Tidak ada lokasi terdaftar.';
-                }
+                $outside.value = 1;
+                $hint.textContent =
+                    `Di luar radius. Terdekat: ${nearest.name} ~${Math.round(nearest.d)} m (batas ${nearest.radius} m).`;
+                $alert.textContent =
+                    'Anda berada di luar radius kantor atau lokasi perangkat tidak akurat.';
+                $alert.classList.remove('d-none');
             }
         }
+
+        // Geolocation
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(
                 pos => setUserPosition(pos.coords.latitude, pos.coords.longitude),
-                () => alert('Gagal mengambil lokasi.'), {
+                () => {
+                    alert(
+                        'Gagal mengambil lokasi. Anda tetap bisa coba Clock In setelah ambil foto, namun lokasi tidak terekam.'
+                    );
+                    hasGeolocation = true; // izinkan setelah foto bila user tetap lanjut
+                    updateSubmitState();
+                }, {
                     enableHighAccuracy: true,
                     timeout: 10000
                 }
@@ -205,6 +251,8 @@
         } else {
             alert('Geolocation tidak didukung browser ini.');
         }
+
+        // Kamera
         const video = document.getElementById('camera');
         const canvas = document.getElementById('snapshot');
         const inputPhoto = document.getElementById('clock_in_photo');
@@ -221,20 +269,25 @@
             });
 
         function takeSnapshot() {
-            canvas.width = video.videoWidth;
-            canvas.height = video.videoHeight;
+            canvas.width = video.videoWidth || 640;
+            canvas.height = video.videoHeight || 480;
             canvas.getContext('2d').drawImage(video, 0, 0);
             const imageData = canvas.toDataURL('image/png');
             inputPhoto.value = imageData;
             previewImg.src = imageData;
             previewImg.style.display = 'block';
+            hasPhoto = true;
+            updateSubmitState();
         }
 
         function resetPhoto() {
             inputPhoto.value = '';
             previewImg.src = '#';
             previewImg.style.display = 'none';
+            hasPhoto = false;
+            updateSubmitState();
         }
+
         window.takeSnapshot = takeSnapshot;
         window.resetPhoto = resetPhoto;
     </script>
