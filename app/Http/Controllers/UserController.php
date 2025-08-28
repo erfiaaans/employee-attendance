@@ -67,7 +67,7 @@ class UserController extends Controller
         $user->save();
 
         // upload foto kalau ada
-        $this->uploadProfilePicture($request, $user, 'profile_picture', 'profiles');
+        $this->uploadProfilePicture($request, $user, 'profile_picture', 'profile');
 
         return redirect()->route('admin.user')->with('success', 'Data Pegawai berhasil ditambahkan.');
     }
@@ -151,7 +151,7 @@ class UserController extends Controller
         }
 
         // Upload foto baru (jika ada)
-        $this->uploadProfilePicture($request, $user, 'profile_picture', 'profiles');
+        $this->uploadProfilePicture($request, $user, 'profile_picture', 'profile');
 
         // Handle password opsional
         if (empty($validated['password'])) {
