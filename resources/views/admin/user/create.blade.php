@@ -6,7 +6,8 @@
             </div>
             <div class="card-body">
                 <form method="POST"
-                    action="{{ isset($editUser) ? route('admin.user.update', $editUser->user_id) : route('admin.user.store') }}">
+                    action="{{ isset($editUser) ? route('admin.user.update', $editUser->user_id) : route('admin.user.store') }}"
+                    enctype="multipart/form-data">
                     @csrf
                     @if (isset($editUser))
                         @method('PUT')
@@ -18,9 +19,7 @@
                                 class="form-control @error('name') is-invalid @enderror"
                                 value="{{ old('name', $editUser->name ?? '') }}">
                             @error('name')
-                                <span class="invalid-feedback" role="alert">
-                                    <strong>{{ $message }}</strong>
-                                </span>
+                                <span class="invalid-feedback" role="alert"><strong>{{ $message }}</strong></span>
                             @enderror
                         </div>
                         <div class="col-md-4">
@@ -47,9 +46,7 @@
                                 </div>
                             @endforeach
                             @error('role')
-                                <div class="invalid-feedback d-block">
-                                    <strong>{{ $message }}</strong>
-                                </div>
+                                <div class="invalid-feedback d-block"><strong>{{ $message }}</strong></div>
                             @enderror
                         </div>
                         <div class="col-md-4">
@@ -58,59 +55,21 @@
                                 class="form-control @error('position') is-invalid @enderror"
                                 value="{{ old('position', $editUser->position ?? '') }}">
                             @error('position')
-                                <span class="invalid-feedback" role="alert">
-                                    <strong>{{ $message }}</strong>
-                                </span>
+                                <span class="invalid-feedback" role="alert"><strong>{{ $message }}</strong></span>
                             @enderror
                         </div>
                         <div class="col-md-4">
                             <label class="form-label">Email</label>
-                            <input type="text" name="email"
+                            <input type="email" name="email"
                                 class="form-control @error('email') is-invalid @enderror"
                                 value="{{ old('email', $editUser->email ?? '') }}">
                             @error('email')
-                                <span class="invalid-feedback" role="alert">
-                                    <strong>{{ $message }}</strong>
-                                </span>
-                            @enderror
-                        </div>
-                        <div class="col-md-4">
-                            <label class="form-label">Password</label>
-                            <input type="text" name="password"
-                                class="form-control @error('password') is-invalid @enderror"
-                                value="{{ old('password', '') }}">
-                            @error('password')
-                                <span class="invalid-feedback" role="alert">
-                                    <strong>{{ $message }}</strong>
-                                </span>
-                            @enderror
-                        </div>
-                        <div class="col-md-4">
-                            <label class="form-label">Telepon</label>
-                            <input type="text" name="telephone"
-                                class="form-control @error('telephone') is-invalid @enderror"
-                                value="{{ old('telephone', $editUser->telephone ?? '') }}">
-                            @error('telephone')
-                                <span class="invalid-feedback" role="alert">
-                                    <strong>{{ $message }}</strong>
-                                </span>
-                            @enderror
-                        </div>
-                        <div class="col-md-4">
-                            <label class="form-label">Foto</label>
-                            <input type="url" name="profile_picture_url"
-                                class="form-control @error('profile_picture_url') is-invalid @enderror"
-                                value="{{ old('profile_picture_url', $editUser->profile_picture_url ?? '') }}">
-                            @error('profile_picture_url')
-                                <span class="invalid-feedback" role="alert">
-                                    <strong>{{ $message }}</strong>
-                                </span>
+                                <span class="invalid-feedback" role="alert"><strong>{{ $message }}</strong></span>
                             @enderror
                         </div>
                         <div class="col-md-4">
                             @php
                                 use App\Enums\UserGender;
-
                                 $selectedGender = old(
                                     'gender',
                                     isset($editUser)
@@ -135,10 +94,54 @@
                                 <label class="form-check-label" for="genderMale">{{ UserGender::Male->value }}</label>
                             </div>
                             @error('gender')
-                                <div class="invalid-feedback d-block">
-                                    <strong>{{ $message }}</strong>
-                                </div>
+                                <div class="invalid-feedback d-block"><strong>{{ $message }}</strong></div>
                             @enderror
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">
+                                Password {!! isset($editUser) ? '<small class="text-muted">(kosongkan jika tidak ganti)</small>' : '' !!}
+                            </label>
+                            <input type="password" name="password"
+                                class="form-control @error('password') is-invalid @enderror"
+                                autocomplete="new-password">
+                            @error('password')
+                                <span class="invalid-feedback" role="alert"><strong>{{ $message }}</strong></span>
+                            @enderror
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Telepon</label>
+                            <input type="text" name="telephone"
+                                class="form-control @error('telephone') is-invalid @enderror"
+                                value="{{ old('telephone', $editUser->telephone ?? '') }}"
+                                placeholder="+62812xxxxxx atau 0812xxxxxx">
+                            @error('telephone')
+                                <span class="invalid-feedback" role="alert"><strong>{{ $message }}</strong></span>
+                            @enderror
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Foto</label>
+                            <input type="file" name="profile_picture" accept="image/*"
+                                class="form-control @error('profile_picture') is-invalid @enderror">
+                            @error('profile_picture')
+                                <span class="invalid-feedback" role="alert"><strong>{{ $message }}</strong></span>
+                            @enderror
+                            @if (!empty($editUser?->profile_picture_url))
+                                <div class="mt-2">
+                                    <img src="{{ $editUser->photo_url }}" alt="Foto" width="120"
+                                        class="rounded">
+                                    <div class="form-check mt-2">
+                                        <input class="form-check-input" type="checkbox" name="remove_profile_picture"
+                                            id="remove_profile_picture" value="1">
+                                        <label class="form-check-label" for="remove_profile_picture">Hapus
+                                            foto</label>
+                                    </div>
+                                </div>
+                            @endif
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Konfirmasi Password</label>
+                            <input type="password" name="password_confirmation" class="form-control"
+                                autocomplete="new-password">
                         </div>
                     </div>
                     <div class="mt-3">

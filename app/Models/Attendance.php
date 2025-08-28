@@ -42,7 +42,6 @@ class Attendance extends Model
 
     public function getClockInPhotoPathAttribute(): string
     {
-        return asset('storage/' . $this->clock_in_photo_url);
         if ($this->clock_in_photo_url && Storage::disk('public')->exists($this->clock_in_photo_url)) {
             return asset('storage/' . $this->clock_in_photo_url);
         }

@@ -8,99 +8,90 @@ use App\Models\Location;
 use App\Models\OfficeLocationUser;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use Illuminate\Validation\Rule;
 
 class UserLocationController extends Controller
 {
-    public function index(Request $request, $id = null)
+    public function index(Request $request)
     {
-        $usersLocations =  OfficeLocationUser::with(['user', 'locations'])
-            ->when($request->search, function ($query, $search) {
+        $search = $request->input('search');
+        $usersLocations = OfficeLocationUser::with(['user', 'locations'])
+            ->when($search, function ($query, $search) {
                 $query->where(function ($q) use ($search) {
                     $q->whereHas('user', function ($qu) use ($search) {
                         $qu->where('name', 'like', "%{$search}%")
                             ->orWhere('position', 'like', "%{$search}%");
-                    })
-                        ->orWhereHas('locations', function ($ql) use ($search) {
-                            $ql->where('office_name', 'like', "%{$search}%");
-                        });
+                    })->orWhereHas('locations', function ($ql) use ($search) {
+                        $ql->where('office_name', 'like', "%{$search}%");
+                    });
                 });
             })
-            // ->orderBy(User::select('name')->whereColumn('users.user_id', 'office_location_user.user_id'))
             ->join('users', 'users.user_id', '=', 'office_location_user.user_id')
             ->orderBy('users.name')
             ->select('office_location_user.*')
-            ->paginate(10);
-
-        $users = User::orderBy('name')->get();
+            ->paginate(10)
+            ->appends(['search' => $search]);
+        $users     = User::orderBy('name')->get();
         $locations = Location::orderBy('office_name')->get();
-
-        return view('admin.userLocation.index', compact('usersLocations', 'users', 'locations'));
+        $editItem = null;
+        if ($request->filled('edit')) {
+            $editId = $request->query('edit');
+            $editItem = OfficeLocationUser::with(['user', 'locations'])
+                ->where('location_user_id', $editId)
+                ->first();
+            if (!$editItem) {
+                return redirect()->route('admin.userLocation.index')
+                    ->with('error', 'Data yang ingin diedit tidak ditemukan.');
+            }
+        }
+        return view('admin.userLocation.index', compact('usersLocations', 'users', 'locations', 'editItem'));
     }
     public function store(Request $request)
     {
-        // dd($request->all());
         $request->validate([
-            'user_id' => 'required|exists:users,user_id',
-            'location_id' => 'required|exists:locations,location_id',
+            'user_id' => ['required', 'exists:users,user_id'],
+            'location_id' => [
+                'required',
+                'exists:locations,location_id',
+                Rule::unique('office_location_user')->where(
+                    fn($q) =>
+                    $q->where('user_id', $request->user_id)
+                        ->where('location_id', $request->location_id)
+                ),
+            ],
         ]);
-
         OfficeLocationUser::create([
             'location_user_id' => Str::uuid(),
-            'user_id' => $request->user_id,
+            'user_id'    => $request->user_id,
             'location_id' => $request->location_id,
-            // 'created_by' => auth()->id(),
-            // 'created_by' => auth()->user()->user_id,
         ]);
         return redirect()->route('admin.userLocation.index')->with('success', 'Lokasi pegawai berhasil ditambahkan.');
-    }
-    public function edit(Request $request, $id)
-    {
-        $usersLocations =  OfficeLocationUser::with(['user', 'locations'])
-            ->when($request->search, function ($query, $search) {
-                $query->where(function ($q) use ($search) {
-                    $q->whereHas('user', function ($qu) use ($search) {
-                        $qu->where('name', 'like', "%{$search}%")
-                            ->orWhere('position', 'like', "%{$search}%");
-                    })
-                        ->orWhereHas('locations', function ($ql) use ($search) {
-                            $ql->where('office_name', 'like', "%{$search}%");
-                        });
-                });
-            })
-            // ->orderBy(User::select('name')->whereColumn('users.user_id', 'office_location_user.user_id'))
-            ->join('users', 'users.user_id', '=', 'office_location_user.user_id')
-            ->orderBy('users.name')
-            ->select('office_location_user.*')
-            ->paginate(10);
-
-        $officeLocationUser = OfficeLocationUser::findOrFail($id);
-        $users = User::orderBy('name')->get();
-        $locations = Location::orderBy('office_name')->get();
-
-        return view('admin.userLocation.index', compact('officeLocationUser', 'users', 'locations', 'usersLocations'));
     }
     public function update(Request $request, $id)
     {
         $request->validate([
-            'user_id' => 'required|exists:users,user_id',
-            'location_id' => 'required|exists:locations,location_id',
+            'user_id' => ['required', 'exists:users,user_id'],
+            'location_id' => [
+                'required',
+                'exists:locations,location_id',
+                Rule::unique('office_location_user')->ignore($id, 'location_user_id')->where(
+                    fn($q) =>
+                    $q->where('user_id', $request->user_id)
+                        ->where('location_id', $request->location_id)
+                ),
+            ],
         ]);
-
-        $officeLocationUser = OfficeLocationUser::findOrFail($id);
+        $officeLocationUser = OfficeLocationUser::where('location_user_id', $id)->firstOrFail();
         $officeLocationUser->update([
-            'user_id' => $request->user_id,
+            'user_id'     => $request->user_id,
             'location_id' => $request->location_id,
         ]);
-
         return redirect()->route('admin.userLocation.index')->with('success', 'Data lokasi pegawai berhasil diperbarui.');
     }
     public function destroy($id)
     {
-        $userLocation = OfficeLocationUser::findOrFail($id);
-        // if ($user->profile_picture_url && \Storage::disk('public')->exists($userLocation->profile_picture_url)) {
-        //     \Storage::disk('public')->delete($userLocation->profile_picture_url);
-        // }
-        $userLocation->delete();
-        return redirect()->route('admin.userLocation.index')->with('success', 'User berhasil dihapus.');
+        $item = OfficeLocationUser::where('location_user_id', $id)->firstOrFail();
+        $item->delete();
+        return redirect()->route('admin.userLocation.index')->with('success', 'Data lokasi pegawai berhasil dihapus.');
     }
 }

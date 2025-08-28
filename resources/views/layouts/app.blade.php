@@ -171,13 +171,12 @@
 
                                 </div>
                             </div>
-                            <!-- User -->
                             <li class="nav-item navbar-dropdown dropdown-user dropdown">
                                 <a class="nav-link dropdown-toggle hide-arrow p-0" href="javascript:void(0);"
                                     data-bs-toggle="dropdown">
                                     <div class="avatar avatar-online">
-                                        <img src="{{ auth()->user()->photo_url }}" alt
-                                            class="w-px-40 h-auto rounded-circle" />
+                                        <img src="{{ auth()->user()->photo_url ?? asset('images/avatar-placeholder.png') . '?v=' . optional($user->updated_at)->timestamp }}"
+                                            class="w-px-40 h-auto rounded-circle" alt="Avatar">
                                     </div>
                                 </a>
                                 <ul class="dropdown-menu dropdown-menu-end">
@@ -186,12 +185,11 @@
                                             <div class="d-flex">
                                                 <div class="flex-shrink-0 me-3">
                                                     <div class="avatar avatar-online">
-                                                        <img src="{{ auth()->user()->photo_url }}" alt
-                                                            class="w-px-40 h-auto rounded-circle" />
+                                                        <img src="{{ auth()->user()->photo_url ?? asset('images/avatar-placeholder.png') . '?v=' . optional($user->updated_at)->timestamp }}"
+                                                            class="w-px-40 h-auto rounded-circle" alt="Avatar">
                                                     </div>
                                                 </div>
                                                 <div class="flex-grow-1">
-                                                    {{-- <strong>{{ Auth::user()->name }}!</strong> --}}
                                                     <h6 class="mb-0">{{ Auth::user()->name }}</h6>
                                                     <small
                                                         class="text-body-secondary">{{ Auth::user()->role }}</small>

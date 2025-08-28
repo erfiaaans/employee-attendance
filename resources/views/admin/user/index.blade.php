@@ -21,20 +21,6 @@
                                             style="max-width: 250px;" placeholder="Cari nama pegawai, jabatan, kantor..."
                                             value="{{ request('search') }}">
                                         <button type="submit" class="btn btn-light btn-sm">Cari</button>
-                                        <div class="dropdown">
-                                            <button class="btn btn-secondary btn-sm dropdown-toggle" type="button"
-                                                data-bs-toggle="dropdown" aria-expanded="false">
-                                                Pilih Pegawai
-                                            </button>
-                                            <ul class="dropdown-menu">
-                                                @foreach ($allUsers as $user)
-                                                    <li>
-                                                        <a class="dropdown-item"
-                                                            href="{{ route('admin.user', ['search' => $user->name]) }}">{{ $user->name }}</a>
-                                                    </li>
-                                                @endforeach
-                                            </ul>
-                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -65,11 +51,8 @@
                                             <td>{{ $user->telephone }}</td>
                                             <td>{{ $user->email }}</td>
                                             <td>
-                                                @if ($user->user)
-                                                    <img src="{{ $user->user->photo_url }}" alt="Profile" width="60">
-                                                @else
-                                                    -
-                                                @endif
+                                                <img src="{{ $user->photo_url }}" alt="Foto" width="60"
+                                                    class="rounded">
                                             </td>
                                             <td class="text-center">
                                                 <div class="btn-group">
@@ -78,14 +61,17 @@
                                                         @csrf
                                                         @method('DELETE')
                                                         <a href="{{ route('admin.user.edit', $user->user_id) }}"
-                                                            class="btn btn-icon btn-primary btn-sm">
+                                                            class="btn btn-icon btn-primary btn-sm" title="Edit">
                                                             <span class="tf-icons bx bx-edit-alt text-white"></span>
                                                         </a>
                                                         <button type="submit"
-                                                            class="btn btn-icon btn-danger btn-sm swalDeleteData"><i
-                                                                class="tf-icons bx bx-trash text-white"></i></button>
+                                                            class="btn btn-icon btn-danger btn-sm swalDeleteData"
+                                                            title="Delete">
+                                                            <span class="tf-icons bx bx-trash text-white"></span>
+                                                        </button>
                                                     </form>
                                                 </div>
+
                                             </td>
                                         </tr>
                                     @empty

@@ -53,7 +53,7 @@ class ProfileController extends Controller
                 }
 
                 // Upload dan simpan foto baru
-                $path = $request->file('photo')->store('data/profile', 'public');
+                $path = $request->file('photo')->store('profile', 'public');
                 $user->profile_picture_url = $path;
                 $user->save();
             }

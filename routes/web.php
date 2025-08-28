@@ -66,7 +66,7 @@ Route::group(['namespace' => '', 'prefix' => 'admin',  'middleware' => ['auth', 
 
     Route::get('user-location', [UserLocationController::class, 'index'])->name('admin.userLocation.index');
     Route::post('user-location', [UserLocationController::class, 'store'])->name('admin.userLocation.store');
-    Route::get('user-location/{id}/edit', [UserLocationController::class, 'edit'])->name('admin.userLocation.edit');
+    // Route::get('user-location/{id}/edit', [UserLocationController::class, 'edit'])->name('admin.userLocation.edit');
     Route::put('user-location/{id}', [UserLocationController::class, 'update'])->name('admin.userLocation.update');
     Route::delete('user-location/{id}', [UserLocationController::class, 'destroy'])->name('admin.userLocation.destroy');
 });

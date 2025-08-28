@@ -1,7 +1,16 @@
 @extends('layouts.app')
-@push('styles')
-    {{-- <link rel="stylesheet" href="{{ asset('css/dashboardStyle.css') }}"> --}}
-@endpush
+{{-- @section('css')
+    <style>
+        .square-card {
+            min-height: 120px;
+        }
+
+        .icon-img {
+            width: 40px;
+            height: 40px;
+        }
+    </style>
+@endsection --}}
 @section('content')
     <div class="container-xxl flex-grow-1 container-p-y">
         <h4 class="py-3 mb-4">
@@ -10,10 +19,6 @@
             <a href="#" class="text-secondary">
                 {{ __('Master User') }} /</a> {{ __('Detail') }}
         </h4>
-        {{-- <div class="row">
-            <h1>Data Dahboard</h1>
-            <pre>{{ json_encode(Auth::user(), JSON_PRETTY_PRINT) }}</pre>
-        </div> --}}
         <div class="col-12">
             <div class="row">
                 <div class="col-12 col-md-6 col-xl-3 mb-4">
