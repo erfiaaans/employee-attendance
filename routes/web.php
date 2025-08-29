@@ -17,11 +17,44 @@ use App\Http\Middleware\Employee;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Employee\EmployeeAttendanceController;
 use App\Http\Controllers\DashboardController;
+use Illuminate\Support\Facades\Storage;
 
 Route::get('/', [LoginController::class, 'showLoginForm'])->name('index');
 
 
 Auth::routes();
+
+Route::get('/storage/{path}', function ($path) {
+    // dd($path);
+    abort_unless(Storage::disk('public')->exists($path), 404);
+    return Storage::disk('public')->response($path);
+})->where('path', '.*');
+Route::get('/generate', function () {
+    if (function_exists('symlink')) {
+        Artisan::call('storage:link');
+        echo 'symlink created';
+    } else {
+        echo 'symlink() tidak tersedia di server ini';
+    }
+});
+Route::get('/clear-cache', function () {
+    try {
+        Artisan::call('config:clear');
+        Artisan::call('cache:clear');
+        Artisan::call('route:clear');
+
+        return response()->json([
+            'status'  => 'success',
+            'message' => 'Config, cache, dan route berhasil dibersihkan.'
+        ]);
+    } catch (\Exception $e) {
+        return response()->json([
+            'status'  => 'error',
+            'message' => $e->getMessage()
+        ], 500);
+    }
+});
+
 
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 

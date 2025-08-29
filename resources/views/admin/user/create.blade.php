@@ -112,8 +112,7 @@
                             <label class="form-label">Telepon</label>
                             <input type="text" name="telephone"
                                 class="form-control @error('telephone') is-invalid @enderror"
-                                value="{{ old('telephone', $editUser->telephone ?? '') }}"
-                                placeholder="+62812xxxxxx atau 0812xxxxxx">
+                                value="{{ old('telephone', $editUser->telephone ?? '') }}" placeholder="0812xxxxxx">
                             @error('telephone')
                                 <span class="invalid-feedback" role="alert"><strong>{{ $message }}</strong></span>
                             @enderror

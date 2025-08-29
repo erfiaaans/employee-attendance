@@ -67,7 +67,7 @@
                                         style="border-radius:10px;border:1px solid #ccc;"></video>
                                     <canvas id="snapshot" style="display:none;"></canvas>
                                     <div class="mt-2 d-flex gap-2">
-                                        <button type="button" class="btn btn-secondary mt-2" onclick="takeSnapshot()">Ambil
+                                        <button type="button" class="btn btn-success mt-2" onclick="takeSnapshot()">Ambil
                                             Foto</button>
                                         <button type="button" class="btn btn-outline-danger mt-2 ms-2"
                                             onclick="resetPhoto()">Batal</button>
