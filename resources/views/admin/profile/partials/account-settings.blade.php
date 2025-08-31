@@ -33,6 +33,9 @@
             <label for="position" class="form-label">Jabatan</label>
             <input class="form-control" value="{{ old('position', $user->position ?? '') }}" type="text"
                 id="position" name="position" />
+            @error('position')
+                <div class="invalid-feedback">{{ $message }}</div>
+            @enderror
         </div>
         <div class="col-md-6">
             <label for="email" class="form-label">E-mail</label>
@@ -45,11 +48,9 @@
                 <input type="text" id="telephone" name="telephone" class="form-control"
                     value="{{ old('telephone', $user->telephone ?? '') }}" />
             </div>
-        </div>
-        <div class="col-md-6">
-            <label for="office-name" class="form-label">Kantor</label>
-            <input class="form-control" type="text" id="office-name" name="office-name"
-                value="{{ old('email', $user->office_name ?? '') }}" />
+            @error('telephone')
+                <div class="invalid-feedback">{{ $message }}</div>
+            @enderror
         </div>
         <div class="mt-4">
             <button type="submit" class="btn btn-primary me-3 mb-3"> Update</button>

@@ -33,7 +33,16 @@
                                         <tr>
                                             <td>{{ $index + 1 }}</td>
                                             <td>{{ $user->name }}</td>
-                                            <td>{{ $user->role }}</td>
+                                            <td>
+                                                @if ($user->role === App\Enums\UserRole::ADMIN)
+                                                    <span class="badge bg-primary">Admin</span>
+                                                @elseif ($user->role === App\Enums\UserRole::EMPLOYEE)
+                                                    <span class="badge bg-info">Employee</span>
+                                                @else
+                                                    <span class="badge bg-light text-dark">{{ $user->role->value }}</span>
+                                                @endif
+                                            </td>
+
                                             <td>{{ $user->position }}</td>
                                             <td>{{ $user->gender }}</td>
                                             <td>{{ $user->telephone }}</td>
