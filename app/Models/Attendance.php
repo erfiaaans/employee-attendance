@@ -55,4 +55,15 @@ class Attendance extends Model
         }
         return asset('img/icons/user.png');
     }
+    public function getHasClockInPhotoAttribute(): bool
+    {
+        return $this->clock_in_photo_url
+            && Storage::disk('public')->exists($this->clock_in_photo_url);
+    }
+
+    public function getHasClockOutPhotoAttribute(): bool
+    {
+        return $this->clock_out_photo_url
+            && Storage::disk('public')->exists($this->clock_out_photo_url);
+    }
 }

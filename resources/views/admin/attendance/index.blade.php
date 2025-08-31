@@ -176,10 +176,11 @@
                         </form>
                         {{-- Tabel Riwayat --}}
                         <div class="table-responsive mt-5">
-                            <table id="datatable" class="table table-bordered table-hover align-middle table-sm">
+                            <table id="datatable" class="table table-bordered table-hover align-middle table-sm"
+                                style="font-size: 80%">
                                 <thead class="table-light">
                                     <tr>
-                                        <th>No</th>
+                                        <th style="width:10px;">No</th>
                                         <th>Nama</th>
                                         <th>Lokasi </th>
                                         <th>Tanggal</th>
@@ -191,6 +192,8 @@
                                 <tbody>
                                     @forelse ($attendances as $index => $attendance)
                                         @php
+                                            $officeLat = $attendance->location->latitude ?? null;
+                                            $officeLng = $attendance->location->longitude ?? null;
                                             $officeName = $attendance->location->office_name ?? '-';
                                             $radiusMeter = (float) ($attendance->location->radius ?? 0);
                                             $empNameSafe = addslashes($attendance->user->name ?? 'Pegawai');
@@ -213,6 +216,36 @@
                                             $inLng = $attendance->clock_in_longitude;
                                             $outLat = $attendance->clock_out_latitude;
                                             $outLng = $attendance->clock_out_longitude;
+
+                                            $haversine = function ($lat1, $lon1, $lat2, $lon2) {
+                                                if (
+                                                    $lat1 === null ||
+                                                    $lon1 === null ||
+                                                    $lat2 === null ||
+                                                    $lon2 === null
+                                                ) {
+                                                    return null;
+                                                }
+                                                $R = 6371000; // m
+                                                $dLat = deg2rad($lat2 - $lat1);
+                                                $dLon = deg2rad($lon2 - $lon1);
+                                                $rlat1 = deg2rad($lat1);
+                                                $rlat2 = deg2rad($lat2);
+                                                $a =
+                                                    sin($dLat / 2) ** 2 +
+                                                    cos($rlat1) * cos($rlat2) * sin($dLon / 2) ** 2;
+                                                $c = 2 * atan2(sqrt($a), sqrt(1 - $a));
+                                                return $R * $c;
+                                            };
+
+                                            $radiusIn =
+                                                $inLat !== null && $inLng !== null
+                                                    ? $haversine($inLat, $inLng, $officeLat, $officeLng)
+                                                    : null;
+                                            $radiusOut =
+                                                $outLat !== null && $outLng !== null
+                                                    ? $haversine($outLat, $outLng, $officeLat, $officeLng)
+                                                    : null;
                                         @endphp
 
                                         <tr>
@@ -234,6 +267,7 @@
                                                             <div class="presence-avatar">IN</div>
                                                         @endif
                                                     </div>
+
                                                     <div class="presence-meta">
                                                         <div class="presence-line">
                                                             <span class="time">{{ $inTime }}</span>
@@ -246,13 +280,28 @@
                                                                 </button>
                                                             @endif
                                                         </div>
+
                                                         @if (!is_null($inLat) && !is_null($inLng))
-                                                            <div class="coords">({{ $inLat }}, {{ $inLng }})
+                                                            <div class="coords" style="font-size: 85%">
+                                                                ({{ $inLat }}, {{ $inLng }})
+                                                            </div>
+                                                            <div class="mt-1" style="font-size: 85%">
+                                                                @if ($radiusIn !== null)
+                                                                    @if ($radiusMeter && $radiusIn > $radiusMeter)
+                                                                        <span class="badge bg-warning text-dark">
+                                                                            {{ number_format($radiusIn, 0) }} m (di luar
+                                                                            radius)</span>
+                                                                    @else
+                                                                        <span class="badge bg-success">
+                                                                            {{ number_format($radiusIn, 0) }} m</span>
+                                                                    @endif
+                                                                @endif
                                                             </div>
                                                         @endif
                                                     </div>
                                                 </div>
                                             </td>
+
 
                                             {{-- Detail Keluar --}}
                                             <td>
@@ -267,6 +316,7 @@
                                                             <div class="presence-avatar out">OUT</div>
                                                         @endif
                                                     </div>
+
                                                     <div class="presence-meta">
                                                         <div class="presence-line">
                                                             <span class="time">{{ $outTime }}</span>
@@ -279,9 +329,23 @@
                                                                 </button>
                                                             @endif
                                                         </div>
+
                                                         @if (!is_null($outLat) && !is_null($outLng))
-                                                            <div class="coords">({{ $outLat }},
-                                                                {{ $outLng }})</div>
+                                                            <div class="coords" style="font-size: 85%">
+                                                                ({{ $outLat }}, {{ $outLng }})
+                                                            </div>
+                                                            <div class="mt-1" style="font-size: 85%">
+                                                                @if ($radiusOut !== null)
+                                                                    @if ($radiusMeter && $radiusOut > $radiusMeter)
+                                                                        <span class="badge bg-warning text-dark">
+                                                                            {{ number_format($radiusOut, 0) }} m (di luar
+                                                                            radius)</span>
+                                                                    @else
+                                                                        <span class="badge bg-success">
+                                                                            {{ number_format($radiusOut, 0) }} m</span>
+                                                                    @endif
+                                                                @endif
+                                                            </div>
                                                         @endif
                                                     </div>
                                                 </div>
@@ -305,7 +369,7 @@
                                         </tr>
                                     @empty
                                         <tr>
-                                            <td colspan="7" class="text-center">Data absensi tidak ditemukan.</td>
+                                            <td colspan="9" class="text-center">Data absensi tidak ditemukan.</td>
                                         </tr>
                                     @endforelse
                                 </tbody>
