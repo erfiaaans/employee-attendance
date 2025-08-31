@@ -116,7 +116,7 @@
 
                     <div class="card-body">
                         {{-- Form Pencarian --}}
-                        <form method="GET" action="{{ route('admin.attendance') }}">
+                        {{-- <form method="GET" action="{{ route('admin.attendance') }}">
                             <div class="row mb-2">
                                 <div class="col-md-12">
                                     <div class="d-flex align-items-center flex-wrap gap-2">
@@ -130,62 +130,62 @@
                                     </div>
                                 </div>
                             </div>
-                        </form>
+                        </form> --}}
 
-                        {{-- Export Periode --}}
-                        <form action="{{ route('admin.attendance.exportByPeriode') }}" method="GET" class="my-3">
-                            <div class="row g-2 align-items-end">
-                                <div class="col-md-3">
-                                    <label for="start_date_export" class="form-label">Tanggal Mulai</label>
-                                    <input type="date" name="start_date" id="start_date_export" class="form-control"
-                                        value="{{ request('start_date') }}" required>
-                                </div>
-                                <div class="col-md-3">
-                                    <label for="end_date_export" class="form-label">Tanggal Selesai</label>
-                                    <input type="date" name="end_date" id="end_date_export" class="form-control"
-                                        value="{{ request('end_date') }}" required>
-                                </div>
-                                <div class="col-md-3">
-                                    <button type="submit" class="btn btn-success">
-                                        <i class="bx bx-download"></i> Export Periode
-                                    </button>
-                                </div>
-                            </div>
-                        </form>
-
-                        {{-- Hapus Periode --}}
-                        <form action="{{ route('admin.attendance.destroyByPeriode') }}" method="POST" class="my-3">
+                        <form action="{{ route('admin.attendance.handlePeriode') }}" method="POST" class="my-3"
+                            id="periodeForm">
                             @csrf
-                            @method('DELETE')
-                            <div class="row g-2 align-items-end">
-                                <div class="col-md-3">
-                                    <label for="start_date" class="form-label">Tanggal Mulai</label>
-                                    <input type="date" name="start_date" id="start_date" class="form-control" required>
+                            <div class="row g-3">
+                                <div class="col-md-4">
+                                    <div class="row">
+                                        <label for="start_date"
+                                            class="col-sm-3 col-form-label col-form-label-sm">Mulai</label>
+                                        <div class="col-sm-9">
+                                            <input type="date" name="start_date" id="start_date"
+                                                class="form-control form-control-sm @error('start_date') is-invalid @enderror"
+                                                value="{{ old('start_date', '') }}">
+                                            @error('start_date')
+                                                <div class="invalid-feedback d-block">{{ $message }}</div>
+                                            @enderror
+                                        </div>
+                                    </div>
                                 </div>
-                                <div class="col-md-3">
-                                    <label for="end_date" class="form-label">Tanggal Selesai</label>
-                                    <input type="date" name="end_date" id="end_date" class="form-control" required>
+                                <div class="col-md-4">
+                                    <div class="row">
+                                        <label for="end_date"
+                                            class="col-sm-3 col-form-label col-form-label-sm">Selesai</label>
+                                        <div class="col-sm-9">
+                                            <input type="date" name="end_date" id="end_date"
+                                                class="form-control form-control-sm @error('end_date') is-invalid @enderror"
+                                                value="{{ old('end_date', '') }}">
+                                            @error('end_date')
+                                                <div class="invalid-feedback d-block">{{ $message }}</div>
+                                            @enderror
+                                        </div>
+                                    </div>
                                 </div>
-                                <div class="col-md-3">
-                                    <button type="submit" class="btn btn-icn btn-danger swalDeleteData">
-                                        <i class="tf-icons bx bx-trash text-white"></i>Hapus Berdasarkan Periode
+                                <div class="col-md-4 d-flex gap-2 align-items-start">
+                                    <button type="submit" name="action" value="export" class="btn btn-info btn-sm">
+                                        <i class="bx bx-download"></i> Export
+                                    </button>
+                                    <button type="button" class="btn btn-danger btn-sm swalDeleteData">
+                                        <i class="tf-icons bx bx-trash text-white"></i> Hapus
                                     </button>
                                 </div>
                             </div>
                         </form>
-
                         {{-- Tabel Riwayat --}}
-                        <div class="table-responsive">
-                            <table class="table table-bordered table-hover align-middle">
+                        <div class="table-responsive mt-5">
+                            <table id="datatable" class="table table-bordered table-hover align-middle table-sm">
                                 <thead class="table-light">
                                     <tr>
                                         <th>No</th>
-                                        <th>Nama Pegawai</th>
-                                        <th>Lokasi Absensi</th>
+                                        <th>Nama</th>
+                                        <th>Lokasi </th>
                                         <th>Tanggal</th>
                                         <th>Detail Masuk</th>
                                         <th>Detail Keluar</th>
-                                        <th style="width:110px;">Aksi</th>
+                                        <th style="width:20px;">Aksi</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -216,7 +216,7 @@
                                         @endphp
 
                                         <tr>
-                                            <td>{{ $index + $attendances->firstItem() }}</td>
+                                            <td>{{ $index + 1 }}</td>
                                             <td>{{ $attendance->user->name ?? '-' }}</td>
                                             <td>{{ $officeName }}</td>
                                             <td>{{ $date }}</td>
@@ -227,7 +227,9 @@
                                                     <div class="presence-photo">
                                                         @if ($attendance->clock_in_photo_url)
                                                             <img src="{{ $attendance->clock_in_photo_path }}"
-                                                                alt="Clock In">
+                                                                alt="Foto Masuk"
+                                                                onclick="showPhotoModal('{{ $attendance->clock_in_photo_path }}')"
+                                                                style="cursor:pointer">
                                                         @else
                                                             <div class="presence-avatar">IN</div>
                                                         @endif
@@ -258,7 +260,9 @@
                                                     <div class="presence-photo">
                                                         @if ($attendance->clock_out_photo_url)
                                                             <img src="{{ $attendance->clock_out_photo_path }}"
-                                                                alt="Clock Out">
+                                                                alt="Foto Keluar"
+                                                                onclick="showPhotoModal('{{ $attendance->clock_out_photo_path }}')"
+                                                                style="cursor:pointer">
                                                         @else
                                                             <div class="presence-avatar out">OUT</div>
                                                         @endif
@@ -314,7 +318,7 @@
         </div>
 
         {{-- Pagination --}}
-        <div class="my-4 px-3">
+        {{-- <div class="my-4 px-3">
             <nav aria-label="...">
                 <ul class="pagination">
                     <li class="page-item {{ $attendances->onFirstPage() ? 'disabled' : '' }}">
@@ -330,7 +334,7 @@
                     </li>
                 </ul>
             </nav>
-        </div>
+        </div> --}}
 
         {{-- Modal Peta OSM --}}
         <div class="modal fade" id="mapModal" tabindex="-1" aria-labelledby="mapModalLabel" aria-hidden="true">
@@ -346,6 +350,18 @@
                 </div>
             </div>
         </div>
+        {{-- Modal Foto --}}
+        <div class="modal fade" id="photoModal" tabindex="-1" aria-labelledby="photoModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-lg">
+                <div class="modal-content bg-transparent border-0 shadow-none">
+                    <button type="button" class="btn-close ms-auto me-2 mt-2" data-bs-dismiss="modal"
+                        aria-label="Close"></button>
+                    <div class="modal-body text-center p-0">
+                        <img id="photoModalImg" src="" alt="Foto Absensi" class="img-fluid rounded shadow">
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 @endsection
 
@@ -356,6 +372,13 @@
 
     <script>
         // Tampilkan peta pada modal, reuse instance untuk performa
+        function showPhotoModal(url) {
+            const modalImg = document.getElementById('photoModalImg');
+            modalImg.src = url;
+            const photoModal = new bootstrap.Modal(document.getElementById('photoModal'));
+            photoModal.show();
+        }
+
         function showMapWithRadius(lat, lng, title, radiusMeter) {
             const modalEl = document.getElementById('mapModal');
             const mapEl = document.getElementById('leafletMap');

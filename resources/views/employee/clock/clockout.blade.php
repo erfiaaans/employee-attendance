@@ -15,6 +15,10 @@
             aspect-ratio: 16/9;
         }
 
+        .tab-content:not(.doc-example-content) {
+            padding: 0px;
+        }
+
         @media (max-width: 767.98px) {
             #submitBtn {
                 position: sticky;
@@ -31,36 +35,46 @@
             <a href="#"><span class="text-muted fw-light">{{ __('Dashboards') }} /</span></a>
             <a href="#" class="text-secondary">{{ __('Clock Out') }}</a>
         </h4>
-
         @if ($alreadyClockedOut)
             <div class="alert alert-info">Anda sudah melakukan Clock Out hari ini.</div>
         @else
-            {{-- STATUS & ALERT --}}
-            <div class="alert d-flex align-items-center justify-content-between mb-2 py-2 px-3 border">
-                <div>
-                    <strong class="me-2">Status:</strong>
-                    <span id="radiusBadge" class="badge bg-secondary">Menunggu lokasi…</span>
-                    <small id="radiusInfo" class="text-muted ms-2"></small>
-                </div>
-                <small class="text-muted d-none d-md-inline">Pastikan wajah terlihat jelas & lokasi aktif</small>
-            </div>
-            <div id="radiusAlert" class="alert alert-warning d-none mt-2 mb-3"></div>
-
-            {{-- TABS (MOBILE) --}}
-            <div class="d-md-none mb-2">
-                <ul class="nav nav-tabs" role="tablist">
-                    <li class="nav-item" role="presentation">
-                        <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#tabCamera" type="button"
-                            role="tab">Kamera</button>
-                    </li>
-                    <li class="nav-item" role="presentation">
-                        <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tabMap" type="button"
-                            role="tab">Peta</button>
-                    </li>
-                </ul>
-            </div>
-
             <div class="row g-3">
+                <div class="col-12 ">
+                    <div class="card">
+                        <div class="card-body">
+
+                            {{-- STATUS & ALERT --}}
+                            <div class="alert d-flex align-items-center justify-content-between mb-2 py-2 px-3 border">
+                                <div>
+                                    <strong class="me-2">Status:</strong>
+                                    <span id="radiusBadge" class="badge bg-secondary">Menunggu lokasi…</span>
+                                    <br />
+                                    <small id="radiusInfo" class="text-muted"></small>
+                                </div>
+                                <small class="text-muted d-none d-md-inline">Pastikan wajah terlihat jelas & lokasi
+                                    aktif</small>
+                            </div>
+                            <div id="radiusAlert" class="alert alert-warning d-none mt-2 mb-3"></div>
+
+                            {{-- TABS (MOBILE) --}}
+                            <div class="d-md-none mb-2">
+                                <ul class="nav nav-tabs" role="tablist">
+                                    <li class="nav-item" role="presentation">
+                                        <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#tabCamera"
+                                            type="button" role="tab">Kamera</button>
+                                    </li>
+                                    <li class="nav-item" role="presentation">
+                                        <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tabMap"
+                                            type="button" role="tab">Peta</button>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+
                 {{-- KAMERA + FORM (LEFT) --}}
                 <div class="col-12 col-md-6 order-md-1">
                     <div class="tab-content d-md-block">
@@ -105,10 +119,10 @@
                                             <canvas id="snapshot" class="d-none"></canvas>
 
                                             <div class="d-flex gap-2 mt-2">
-                                                <button type="button" class="btn btn-success"
-                                                    onclick="takeSnapshot()">Ambil Foto</button>
-                                                <button type="button" class="btn btn-outline-secondary d-none"
-                                                    id="btnRetake" onclick="resetPhoto()">Ulangi Foto</button>
+                                                <button type="button" class="btn btn-info" onclick="takeSnapshot()">Ambil
+                                                    Foto</button>
+                                                <button type="button" class="btn btn-outline-danger d-none" id="btnRetake"
+                                                    onclick="resetPhoto()">Ulangi Foto</button>
                                             </div>
                                         </div>
 
@@ -340,7 +354,8 @@
                 pos => setUserPosition(pos.coords.latitude, pos.coords.longitude),
                 () => {
                     alert(
-                        'Gagal mengambil lokasi. Anda tetap bisa coba Clock Out setelah ambil foto, namun lokasi tidak terekam.');
+                        'Gagal mengambil lokasi. Anda tetap bisa coba Clock Out setelah ambil foto, namun lokasi tidak terekam.'
+                    );
                     hasGeolocation = true; // tetap izinkan setelah foto
                     updateSubmitState();
                 }, {

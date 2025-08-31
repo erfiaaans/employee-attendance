@@ -18,40 +18,30 @@ class AttendanceController extends Controller
         $search = $request->input('search');
         $userFilter = $request->input('filter');
 
-        $attendances = Attendance::with(['user', 'location'])
-            ->whereHas('user', function ($q) {
-                $q->where('role', 'employee');
-            })
-            ->when($search, function ($query, $search) {
-                $query->where(function ($q) use ($search) {
-                    $q->whereHas('user', function ($q2) use ($search) {
-                        $q2->where('name', 'like', "%{$search}%")
-                            ->orWhere('position', 'like', "%{$search}%");
-                    })->orWhereHas('location', function ($q2) use ($search) {
-                        $q2->where('office_name', 'like', "%{$search}%");
-                    });
-
-                    if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $search)) {
-                        $q->orWhereDate('clock_in_time', $search);
-                    }
-                });
-            })
-            ->when($userFilter, function ($query, $userFilter) {
-                $query->whereHas('user', function ($q) use ($userFilter) {
-                    $q->where('name', $userFilter);
-                });
-            })
-            ->orderBy('clock_in_time', 'desc')
-            ->paginate(10)
-            ->appends([
-                'filter' => $userFilter,
-                'search' => $search,
-            ]);
+        $attendances = Attendance::orderBy('created_at', 'desc')->get();
 
         $allUsers = User::where('role', 'employee')->get();
 
         return view('admin.attendance.index', compact('attendances', 'allUsers', 'userFilter', 'search'));
     }
+    public function handlePeriode(Request $request)
+    {
+        $request->validate([
+            'start_date' => 'required|date',
+            'end_date'   => 'required|date|after_or_equal:start_date',
+        ]);
+        if ($request->action === 'export') {
+            return $this->exportByPeriode($request);
+        } elseif ($request->action === 'delete') {
+            return $this->destroyByPeriode($request);
+        } else {
+            return $this->destroyByPeriode($request);
+        }
+
+        return back()->with('error', 'Aksi tidak dikenali.');
+    }
+
+
     public function destroy($id)
     {
         $attendance = Attendance::findOrFail($id);

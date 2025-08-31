@@ -89,9 +89,10 @@ Route::group(['namespace' => '', 'prefix' => 'admin',  'middleware' => ['auth', 
 
     Route::get('attendance', [AttendanceController::class, 'index'])->name('admin.attendance');
     Route::delete('attendance/delete-by-periode', [AttendanceController::class, 'destroyByPeriode'])->name('admin.attendance.destroyByPeriode');
-    Route::delete('attendance/{id}', [AttendanceController::class, 'destroy'])->whereUuid('id')
-        ->name('admin.attendance.destroy');
+    Route::delete('attendance/{id}', [AttendanceController::class, 'destroy'])->whereUuid('id')->name('admin.attendance.destroy');
     Route::get('attendance/export-by-periode', [AttendanceController::class, 'exportByPeriode'])->name('admin.attendance.exportByPeriode');
+    Route::post('attendance/handle-periode', [AttendanceController::class, 'handlePeriode'])->name('admin.attendance.handlePeriode');
+
 
     Route::get('profile', [ProfileController::class, 'profile'])->name('admin.profile.index');
     Route::put('profile/photo/{id}', [ProfileController::class, 'updatePhoto'])->name('admin.profile.upload_photo');
@@ -112,6 +113,8 @@ Route::group(['namespace' => '', 'prefix' => 'employee',  'middleware' => ['auth
     Route::post('clock/out', [ClockOutController::class, 'storeClockOut'])->name('employee.clock.clockout.store');
 
     Route::get('attendance', [EmployeeAttendanceController::class, 'index'])->name('employee.attendance.index');
+    Route::get('attendance/data', [EmployeeAttendanceController::class, 'data'])
+        ->name('employee.attendance.data');
 
     Route::get('profile', [EmployeeProfileController::class, 'profile'])->name('employee.profile.index');
     Route::put('profile/photo/{id}', [EmployeeProfileController::class, 'updatePhoto'])->name('employee.profile.upload_photo');

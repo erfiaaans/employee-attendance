@@ -14,7 +14,7 @@
                     </div>
 
                     <div class="card-body">
-                        <form method="GET" action="{{ route('employee.attendance.index') }}">
+                        {{-- <form method="GET" action="{{ route('employee.attendance.index') }}">
                             <div class="row mb-2">
                                 <div class="col-md-12">
                                     <div class="d-flex align-items-center flex-wrap gap-2">
@@ -28,10 +28,10 @@
                                     </div>
                                 </div>
                             </div>
-                        </form>
+                        </form> --}}
 
                         <div class="table-responsive">
-                            <table class="table table-bordered table-hover align-middle">
+                            <table id="datatable" class="table table-bordered table-hover align-middle table-sm">
                                 <thead class="table-light">
                                     <tr>
                                         <th>No</th>
@@ -68,8 +68,8 @@
                                             $outLng = $clockOut?->clock_out_longitude;
 
                                             $radiusMeter =
-                                                (float) ($clockIn?->location->radius_meter ??
-                                                    ($clockOut?->location->radius_meter ?? 0));
+                                                (float) ($clockIn?->location->radius ??
+                                                    ($clockOut?->location->radius ?? 0));
                                             $empNameSafe = addslashes(Auth::user()->name);
                                         @endphp
                                         <tr>
@@ -81,7 +81,9 @@
                                                 <div class="presence-item">
                                                     <div class="presence-photo">
                                                         @if ($clockIn && $clockIn->clock_in_photo_url)
-                                                            <img src="{{ $clockIn->clock_in_photo_path }}" alt="Foto Masuk">
+                                                            <img src="{{ $clockIn->clock_in_photo_path }}" alt="Foto Masuk"
+                                                                onclick="showPhotoModal('{{ $clockIn->clock_in_photo_path }}')"
+                                                                style="cursor:pointer">
                                                         @else
                                                             <div class="presence-avatar">IN</div>
                                                         @endif
@@ -111,7 +113,9 @@
                                                     <div class="presence-photo">
                                                         @if ($clockOut && $clockOut->clock_out_photo_url)
                                                             <img src="{{ $clockOut->clock_out_photo_path }}"
-                                                                alt="Foto Keluar">
+                                                                alt="Foto Keluar"
+                                                                onclick="showPhotoModal('{{ $clockOut->clock_out_photo_path }}')"
+                                                                style="cursor:pointer">
                                                         @else
                                                             <div class="presence-avatar out">OUT</div>
                                                         @endif
@@ -159,6 +163,20 @@
                 </div>
             </div>
         </div>
+
+        {{-- Modal Foto --}}
+        <div class="modal fade" id="photoModal" tabindex="-1" aria-labelledby="photoModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-lg">
+                <div class="modal-content bg-transparent border-0 shadow-none">
+                    <button type="button" class="btn-close ms-auto me-2 mt-2" data-bs-dismiss="modal"
+                        aria-label="Close"></button>
+                    <div class="modal-body text-center p-0">
+                        <img id="photoModalImg" src="" alt="Foto Absensi" class="img-fluid rounded shadow">
+                    </div>
+                </div>
+            </div>
+        </div>
+
     </div>
 @endsection
 
@@ -265,6 +283,13 @@
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
         integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
     <script>
+        function showPhotoModal(url) {
+            const modalImg = document.getElementById('photoModalImg');
+            modalImg.src = url;
+            const photoModal = new bootstrap.Modal(document.getElementById('photoModal'));
+            photoModal.show();
+        }
+
         function showMapWithRadius(lat, lng, title, radiusMeter) {
             const modalEl = document.getElementById('mapModal');
             const mapEl = document.getElementById('leafletMap');

@@ -13,20 +13,8 @@
                         <h5 class="mb-0">{{ __('List Data Pegawai') }}</h5>
                     </div>
                     <div class="card-body">
-                        <form method="GET test" action="{{ route('admin.user') }}">
-                            <div class="row mb-2">
-                                <div class="col-md-12">
-                                    <div class="d-flex align-items-center flex-wrap gap-2">
-                                        <input type="text" name="search" class="form-control me-2"
-                                            style="max-width: 250px;" placeholder="Cari nama pegawai, jabatan, kantor..."
-                                            value="{{ request('search') }}">
-                                        <button type="submit" class="btn btn-light btn-sm">Cari</button>
-                                    </div>
-                                </div>
-                            </div>
-                        </form>
                         <div class="table-responsive">
-                            <table class="table table-bordered table-hover">
+                            <table id="datatable" class="table table-bordered table-hover table-sm">
                                 <thead class="table-light">
                                     <tr>
                                         <th>No</th>
@@ -43,7 +31,7 @@
                                 <tbody>
                                     @forelse ($users as $index => $user)
                                         <tr>
-                                            <td>{{ $index + $users->firstItem() }}</td>
+                                            <td>{{ $index + 1 }}</td>
                                             <td>{{ $user->name }}</td>
                                             <td>{{ $user->role }}</td>
                                             <td>{{ $user->position }}</td>
@@ -82,29 +70,9 @@
                                 </tbody>
                             </table>
                         </div>
-                        <div class="my-4 px-3">
-                            <nav aria-label="...">
-                                <ul class="pagination">
-                                    <li class="page-item {{ $users->onFirstPage() ? 'disabled' : '' }}">
-                                        <a class="page-link" href="{{ $users->previousPageUrl() ?? '#' }}">Previous</a>
-                                    </li>
-                                    @for ($i = 1; $i <= $users->lastPage(); $i++)
-                                        <li class="page-item {{ $i == $users->currentPage() ? 'active' : '' }}">
-                                            <a class="page-link" href="{{ $users->url($i) }}">{{ $i }}</a>
-                                        </li>
-                                    @endfor
-                                    <li class="page-item {{ $users->hasMorePages() ? '' : 'disabled' }}">
-                                        <a class="page-link" href="{{ $users->nextPageUrl() ?? '#' }}">Next</a>
-                                    </li>
-                                </ul>
-                            </nav>
-                        </div>
                     </div>
                 </div>
             </div>
-        </div>
-        <div class="d-flex justify-content-end">
-            {{ $users->withQueryString()->links() }}
         </div>
     </div>
 @endsection

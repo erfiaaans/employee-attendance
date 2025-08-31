@@ -38,18 +38,11 @@
                         <h5 class="mb-0">{{ __('List Data Lokasi') }}</h5>
                     </div>
                     <div class="card-body">
-                        <div class="row mb-2">
-                            <div class="col-md-5">
-                                <form method="GET" action="{{ route('admin.location') }}" class="d-flex">
-                                    <input type="text" name="search" class="form-control me-2 form-control"
-                                        placeholder="Cari nama kantor, alamat, kota..." value="{{ request('search') }}">
-                                    <button type="submit" class="btn btn-light btn-sm">Cari</button>
-                                </form>
-                            </div>
-                        </div>
+
                         <div class="row">
                             <div class="col-12 table-responsive">
-                                <table class="table table-bordered user_datatable table-sm" style="font-size: 90%">
+                                <table id="datatable" class="table table-bordered user_datatable table-sm"
+                                    style="font-size: 85%">
                                     <thead class="table-light">
                                         <th style="width: 20px;">#</th>
                                         <th>Nama</th>
@@ -59,14 +52,14 @@
                                         <th>Longitude</th>
                                         <th style="width: 50px;">Radius</th>
                                         {{-- NEW: kolom waktu --}}
-                                        <th style="width: 85px;">Check In</th>
-                                        <th style="width: 85px;">Check Out</th>
-                                        <th style="width: 110px;">Aksi</th>
+                                        <th>Check In</th>
+                                        <th>Check Out</th>
+                                        <th style="width: 70px;">Aksi</th>
                                     </thead>
                                     <tbody class="table-border-bottom-0">
                                         @forelse ($locations as $index => $location)
                                             <tr>
-                                                <td>{{ $index + $locations->firstItem() }}</td>
+                                                <td>{{ $index + 1 }}</td>
                                                 <td>{{ $location->office_name }}</td>
                                                 <td>{{ $location->address }}</td>
                                                 <td>{{ $location->city }}</td>
@@ -106,25 +99,7 @@
                                     </tbody>
                                 </table>
                             </div>
-                            <div class="my-4 px-3">
-                                <nav aria-label="...">
-                                    <ul class="pagination">
-                                        <li class="page-item {{ $locations->onFirstPage() ? 'disabled' : '' }}">
-                                            <a class="page-link"
-                                                href="{{ $locations->previousPageUrl() ?? '#' }}">Previous</a>
-                                        </li>
-                                        @for ($i = 1; $i <= $locations->lastPage(); $i++)
-                                            <li class="page-item {{ $i == $locations->currentPage() ? 'active' : '' }}">
-                                                <a class="page-link"
-                                                    href="{{ $locations->url($i) }}">{{ $i }}</a>
-                                            </li>
-                                        @endfor
-                                        <li class="page-item {{ $locations->hasMorePages() ? '' : 'disabled' }}">
-                                            <a class="page-link" href="{{ $locations->nextPageUrl() ?? '#' }}">Next</a>
-                                        </li>
-                                    </ul>
-                                </nav>
-                            </div>
+
                         </div>
                     </div>
                 </div>

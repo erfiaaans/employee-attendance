@@ -14,38 +14,29 @@ class UserLocationController extends Controller
 {
     public function index(Request $request)
     {
-        $search = $request->input('search');
-        $usersLocations = OfficeLocationUser::with(['user', 'locations'])
-            ->when($search, function ($query, $search) {
-                $query->where(function ($q) use ($search) {
-                    $q->whereHas('user', function ($qu) use ($search) {
-                        $qu->where('name', 'like', "%{$search}%")
-                            ->orWhere('position', 'like', "%{$search}%");
-                    })->orWhereHas('locations', function ($ql) use ($search) {
-                        $ql->where('office_name', 'like', "%{$search}%");
-                    });
-                });
-            })
-            ->join('users', 'users.user_id', '=', 'office_location_user.user_id')
-            ->orderBy('users.name')
-            ->select('office_location_user.*')
-            ->paginate(10)
-            ->appends(['search' => $search]);
-        $users     = User::orderBy('name')->get();
-        $locations = Location::orderBy('office_name')->get();
+        $users = User::where('role', 'employee')->get();
+
+        $locations  = Location::orderBy('office_name')->get(['location_id', 'office_name']);
         $editItem = null;
         if ($request->filled('edit')) {
             $editId = $request->query('edit');
             $editItem = OfficeLocationUser::with(['user', 'locations'])
                 ->where('location_user_id', $editId)
                 ->first();
+
             if (!$editItem) {
                 return redirect()->route('admin.userLocation.index')
                     ->with('error', 'Data yang ingin diedit tidak ditemukan.');
             }
         }
-        return view('admin.userLocation.index', compact('usersLocations', 'users', 'locations', 'editItem'));
+
+        return view('admin.userLocation.index', [
+            'users'      => $users,
+            'locations'  => $locations,
+            'editItem'   => $editItem,
+        ]);
     }
+
     public function store(Request $request)
     {
         $request->validate([

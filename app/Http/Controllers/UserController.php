@@ -19,21 +19,12 @@ class UserController extends Controller
 {
     public function index(Request $request,  $id = null)
     {
-        $search = $request->input('search');
-        $users = User::when($search, function ($query, $search) {
-            return $query->where('name', 'like', "%{$search}%")
-                ->orWhere('position', 'like', "%{$search}%")
-                ->orWhere('email', 'like', "%{$search}%");
-        })
-            ->orderBy('name')
-            ->paginate(10)
-            ->appends(['search' => $search]);
-        $allUsers = User::all();
+        $users = User::orderBy('name', 'asc')->get();
         $editUser = null;
         if ($id) {
             $editUser = User::find($id);
         }
-        return view('admin.user.index', compact('users', 'editUser', 'allUsers'));
+        return view('admin.user.index', compact('users', 'editUser'));
     }
 
     public function store(Request $request)

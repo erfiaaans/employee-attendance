@@ -14,14 +14,7 @@ class LocationController extends Controller
     {
         $search = $request->input('search');
 
-        $locations = Location::when($search, function ($query, $search) {
-            return $query->where('office_name', 'like', "%{$search}%")
-                ->orWhere('address', 'like', "%{$search}%")
-                ->orWhere('city', 'like', "%{$search}%");
-        })
-            ->orderBy('office_name')
-            ->paginate(10)
-            ->appends(['search' => $search]);
+        $locations = Location::orderBy('office_name', 'asc')->get();
 
         $editLocation = null;
         if ($id) {

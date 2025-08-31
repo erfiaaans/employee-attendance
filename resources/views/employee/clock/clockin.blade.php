@@ -15,6 +15,10 @@
             aspect-ratio: 16/9;
         }
 
+        .tab-content:not(.doc-example-content) {
+            padding: 0px;
+        }
+
         @media (max-width: 767.98px) {
             #submitBtn {
                 position: sticky;
@@ -29,55 +33,60 @@
     <div class="container mt-4">
         <h4 class="py-3 mb-4">
             <a href="#"><span class="text-muted fw-light">{{ __('Dashboards') }} /</span></a>
-            <a href="#" class="text-secondary">{{ __('Clock Out') }}</a>
+            <a href="#" class="text-secondary">{{ __('Clock In') }}</a>
         </h4>
-
         @if ($alreadyClockedIn)
-            <div class="alert alert-info">Anda sudah melakukan Clock Out hari ini.</div>
+            <div class="alert alert-info">Anda sudah melakukan Clock In hari ini.</div>
         @else
-            {{-- STATUS & ALERT --}}
-            <div class="alert d-flex align-items-center justify-content-between mb-2 py-2 px-3 border">
-                <div>
-                    <strong class="me-2">Status:</strong>
-                    <span id="radiusBadge" class="badge bg-secondary">Menunggu lokasi…</span>
-                    <small id="radiusInfo" class="text-muted ms-2"></small>
-                </div>
-                <small class="text-muted d-none d-md-inline">Pastikan wajah terlihat jelas & lokasi aktif</small>
-            </div>
-            <div id="radiusAlert" class="alert alert-warning d-none mt-2 mb-3"></div>
-
-            {{-- TABS (MOBILE) --}}
-            <div class="d-md-none mb-2">
-                <ul class="nav nav-tabs" role="tablist">
-                    <li class="nav-item" role="presentation">
-                        <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#tabCamera" type="button"
-                            role="tab">Kamera</button>
-                    </li>
-                    <li class="nav-item" role="presentation">
-                        <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tabMap" type="button"
-                            role="tab">Peta</button>
-                    </li>
-                </ul>
-            </div>
-
             <div class="row g-3">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-body">
+                            {{-- STATUS & ALERT --}}
+                            <div class="alert d-flex align-items-center justify-content-between mb-2 py-2 px-3 border">
+                                <div>
+                                    <strong class="me-2">Status:</strong>
+                                    <span id="radiusBadge" class="badge bg-secondary">Menunggu lokasi…</span><br>
+                                    <small id="radiusInfo" class="text-muted"></small>
+                                </div>
+                                <small class="text-muted d-none d-md-inline">Pastikan wajah jelas & lokasi aktif</small>
+                            </div>
+                            <div id="radiusAlert" class="alert alert-warning d-none mt-2 mb-3"></div>
+
+                            {{-- TABS (MOBILE) --}}
+                            <div class="d-md-none mb-2">
+                                <ul class="nav nav-tabs" role="tablist">
+                                    <li class="nav-item" role="presentation">
+                                        <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#tabCamera"
+                                            type="button" role="tab">Kamera</button>
+                                    </li>
+                                    <li class="nav-item" role="presentation">
+                                        <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tabMap"
+                                            type="button" role="tab">Peta</button>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 {{-- KAMERA + FORM (LEFT) --}}
                 <div class="col-12 col-md-6 order-md-1">
                     <div class="tab-content d-md-block">
                         <div id="tabCamera" class="tab-pane fade show active d-md-block">
                             <div class="card h-100">
                                 <div class="card-header">
-                                    <h5 class="mb-0">Ambil Foto Clock Out</h5>
+                                    <h5 class="mb-0">Ambil Foto Clock In</h5>
                                 </div>
                                 <div class="card-body">
-                                    <form action="{{ route('employee.clock.clockout.store') }}" method="POST">
+                                    <form action="{{ route('employee.clock.clockin.store') }}" method="POST">
                                         @csrf
 
-                                        {{-- Hidden inputs --}}
+                                        {{-- Hidden inputs (CONSISTENT: clock_in_*) --}}
                                         <input type="hidden" id="location_id" name="location_id">
-                                        <input type="hidden" id="clock_out_photo" name="clock_out_photo">
-                                        <input type="hidden" id="clock_out_latitude" name="clock_out_latitude">
-                                        <input type="hidden" id="clock_out_longitude" name="clock_out_longitude">
+                                        <input type="hidden" id="clock_in_photo" name="clock_in_photo">
+                                        <input type="hidden" id="clock_in_latitude" name="clock_in_latitude">
+                                        <input type="hidden" id="clock_in_longitude" name="clock_in_longitude">
                                         <input type="hidden" id="outside_radius" name="outside_radius" value="0">
                                         <input type="hidden" id="distance_meters" name="distance_meters" value="">
 
@@ -105,14 +114,14 @@
                                             <canvas id="snapshot" class="d-none"></canvas>
 
                                             <div class="d-flex gap-2 mt-2">
-                                                <button type="button" class="btn btn-success"
-                                                    onclick="takeSnapshot()">Ambil Foto</button>
-                                                <button type="button" class="btn btn-outline-secondary d-none"
-                                                    id="btnRetake" onclick="resetPhoto()">Ulangi Foto</button>
+                                                <button type="button" class="btn btn-info" onclick="takeSnapshot()">Ambil
+                                                    Foto</button>
+                                                <button type="button" class="btn btn-outline-danger d-none" id="btnRetake"
+                                                    onclick="resetPhoto()">Ulangi Foto</button>
                                             </div>
                                         </div>
 
-                                        {{-- Koordinat --}}
+                                        {{-- Koordinat (readonly tampilan) --}}
                                         <div class="mt-3">
                                             <label class="form-label">Koordinat</label>
                                             <div class="row g-2">
@@ -130,7 +139,7 @@
                                         {{-- Submit --}}
                                         <div class="mt-3">
                                             <button type="submit" class="btn btn-primary w-100 w-md-auto" id="submitBtn"
-                                                disabled>Clock Out</button>
+                                                disabled>Clock In</button>
                                         </div>
                                     </form>
                                 </div> {{-- /card-body --}}
@@ -236,10 +245,11 @@
         let hasGeolocation = false;
         let hasPhoto = false;
 
-        const $latH = document.getElementById('clock_out_latitude');
-        const $lngH = document.getElementById('clock_out_longitude');
-        const $latT = document.getElementById('latitude');
-        const $lngT = document.getElementById('longitude');
+        // UPDATED: ambil elemen dengan prefix clock_in_*
+        const $latH = document.getElementById('clock_in_latitude');
+        const $lngH = document.getElementById('clock_in_longitude');
+        const $latT = document.getElementById('latitude'); // hanya display
+        const $lngT = document.getElementById('longitude'); // hanya display
         const $locId = document.getElementById('location_id');
         const $outside = document.getElementById('outside_radius');
         const $distH = document.getElementById('distance_meters');
@@ -251,7 +261,7 @@
 
         const video = document.getElementById('camera');
         const canvas = document.getElementById('snapshot');
-        const inputPhoto = document.getElementById('clock_out_photo');
+        const inputPhoto = document.getElementById('clock_in_photo'); // UPDATED
         const previewImg = document.getElementById('photo_preview');
         const cameraWrap = document.getElementById('cameraWrap');
         const btnRetake = document.getElementById('btnRetake');
@@ -278,10 +288,10 @@
                 icon: BlueIcon
             }).addTo(map).bindPopup('Lokasi Anda').openPopup();
 
-            $latH.value = lat;
-            $lngH.value = lng;
-            $latT.value = lat;
-            $lngT.value = lng;
+            $latH.value = lat; // clock_in_latitude
+            $lngH.value = lng; // clock_in_longitude
+            $latT.value = lat; // display
+            $lngT.value = lng; // display
             hasGeolocation = true;
             updateSubmitState();
 
@@ -340,8 +350,8 @@
                 pos => setUserPosition(pos.coords.latitude, pos.coords.longitude),
                 () => {
                     alert(
-                        'Gagal mengambil lokasi. Anda tetap bisa coba Clock Out setelah ambil foto, namun lokasi tidak terekam.'
-                        );
+                        'Gagal mengambil lokasi. Anda tetap bisa coba Clock In setelah ambil foto, namun lokasi tidak terekam.'
+                    );
                     hasGeolocation = true; // tetap izinkan setelah foto
                     updateSubmitState();
                 }, {
@@ -369,7 +379,7 @@
             canvas.height = video.videoHeight || 480;
             canvas.getContext('2d').drawImage(video, 0, 0);
             const imageData = canvas.toDataURL('image/png');
-            inputPhoto.value = imageData;
+            inputPhoto.value = imageData; // clock_in_photo
 
             previewImg.src = imageData;
             previewImg.classList.remove('d-none');

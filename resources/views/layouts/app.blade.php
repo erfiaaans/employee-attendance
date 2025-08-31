@@ -18,6 +18,8 @@
     <link rel="stylesheet" href="{{ asset('/vendor/fonts/iconify-icons.css') }}" />
     <link rel="stylesheet" href="{{ asset('/vendor/css/core.css') }}" />
     <link rel="stylesheet" href="{{ asset('/vendor/libs/toastr/toastr.min.css') }}">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap5.min.css"
+        class="template-customizer-core-css" />
     <link rel="stylesheet" href="{{ asset('/vendor/libs/sweetalert2-theme-bootstrap-4/bootstrap-4.min.css') }}">
     <link rel="stylesheet" href="{{ asset('/css/demo.css') }}" />
     <link rel="stylesheet" href="{{ asset('/vendor/libs/perfect-scrollbar/perfect-scrollbar.css') }}" />
@@ -259,6 +261,8 @@
         <div class="layout-overlay layout-menu-toggle"></div>
     </div>
     <script src="{{ asset('/vendor/libs/jquery/jquery.js') }}"></script>
+    <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap5.min.js"></script>
     <script src="{{ asset('/vendor/libs/popper/popper.js') }}"></script>
     <script src="{{ asset('/vendor/js/bootstrap.js') }}"></script>
     <script src="{{ asset('/vendor/libs/perfect-scrollbar/perfect-scrollbar.js') }}"></script>
@@ -310,6 +314,41 @@
                     form.submit();
                 }
             })
+        });
+        $(function() {
+            $('#datatable').DataTable({
+                "order": [],
+                "paging": true,
+                "lengthChange": true,
+                "searching": true,
+                "ordering": true,
+                "info": true,
+                "autoWidth": false,
+                "responsive": true,
+                "bJQueryUI": true,
+                "sPaginationType": "full_numbers",
+                // "sDom": '<"clear">lfrtip',
+                "oLanguage": {
+                    "sEmptyTable": "{{ __('No data available in table') }}",
+                    "sProcessing": "{{ __('Processing') }}...",
+                    "sLengthMenu": "{{ __('Show _MENU_ entries') }}",
+                    "sZeroRecords": "{{ __('No matching records found') }}",
+                    "sInfo": "{{ __('Showing _START_ to _END_ of _TOTAL_ entries') }}",
+                    "sInfoEmpty": "{{ __('Showing 0 to 0 of 0 entries') }}",
+                    "sInfoFiltered": "{{ __('(filtered from _MAX_ total entries)') }}",
+                    "sInfoPostFix": "",
+                    "sSearch": "{{ __('Search') }}:",
+                    "sUrl": "",
+                    "oPaginate": {
+                        "sFirst": "<i class='tf-icon bx bx-chevrons-left'></i>",
+                        "sPrevious": "<i class='tf-icon bx bx-chevron-left'></i>",
+                        "sNext": "<i class='tf-icon bx bx-chevron-right'></i>",
+                        "sLast": "<i class='tf-icon bx bx-chevrons-right'></i>"
+                    }
+                },
+                // dom: '<"small"lfrtip>',
+            });
+            // $('.pagination').addClass('pagination-sm');
         });
     </script>
     @yield('scripts')
