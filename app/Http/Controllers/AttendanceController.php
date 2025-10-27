@@ -29,10 +29,7 @@ class AttendanceController extends Controller
     }
     public function handlePeriode(Request $request)
     {
-        $request->validate([
-            'start_date' => 'required|date',
-            'end_date'   => 'required|date|after_or_equal:start_date',
-        ]);
+        $request->validate(['start_date' => 'required|date', 'end_date' => 'required|date|after_or_equal:start_date',]);
         if ($request->action === 'export') {
             return $this->exportByPeriode($request);
         } elseif ($request->action === 'delete') {
@@ -40,8 +37,7 @@ class AttendanceController extends Controller
         } else {
             return $this->destroyByPeriode($request);
         }
-
-        return back()->with('error', 'Aksi tidak dikenali.');
+        // return back()->with('error', 'Aksi tidak dikenali.');
     }
 
 

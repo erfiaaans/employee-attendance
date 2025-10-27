@@ -63,6 +63,7 @@ Route::group(['namespace' => '', 'prefix' => 'admin',  'middleware' => ['auth', 
     Route::get('dashboard/stats', [AdminController::class, 'adminStats'])->name('admin.dashboard.stats');
 
     Route::get('dashboard', [AdminController::class, 'index'])->name('admin.index');
+    // Route::get('dashboard', [AdminController::class, 'index'])->name('admin.dashboard');
     // Route::get('dashboard/stats', function () {
     //     $today = now()->toDateString();
     //     return response()->json([

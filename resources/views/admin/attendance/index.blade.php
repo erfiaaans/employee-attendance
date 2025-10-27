@@ -10,7 +10,6 @@
             width: 100%
         }
 
-        /* Kartu kecil: foto kiri, info kanan */
         .presence-item {
             display: flex;
             gap: .75rem;
@@ -93,7 +92,6 @@
             margin-top: .25rem
         }
 
-        /* Sedikit rapi untuk sel */
         td {
             vertical-align: middle
         }
@@ -104,34 +102,16 @@
     <div class="container-xxl flex-grow-1 container-p-y">
         <h4 class="py-3 mb-4">
             <a href="#"><span class="text-muted fw-light">{{ __('Dashboards') }} /</span></a>
-            <a href="#" class="text-secondary">{{ __('Riwayat Absensi') }}</a>
+            <a href="#" class="text-secondary">{{ __('Riwayat Presensi') }}</a>
         </h4>
 
         <div class="row">
             <div class="card md-12">
                 <div class="col-mb-4">
                     <div class="card-header d-flex justify-content-between align-items-center">
-                        <h5 class="mb-0">{{ __('Riwayat Absensi Pegawai') }}</h5>
+                        <h5 class="mb-0">{{ __('Riwayat Presensi Pegawai') }}</h5>
                     </div>
-
                     <div class="card-body">
-                        {{-- Form Pencarian --}}
-                        {{-- <form method="GET" action="{{ route('admin.attendance') }}">
-                            <div class="row mb-2">
-                                <div class="col-md-12">
-                                    <div class="d-flex align-items-center flex-wrap gap-2">
-                                        <input type="text" name="search" class="form-control me-2"
-                                            style="max-width: 250px;" placeholder="Cari nama, jabatan, kantor, tanggal..."
-                                            value="{{ request('search') }}">
-                                        @if (request('filter'))
-                                            <input type="hidden" name="filter" value="{{ request('filter') }}">
-                                        @endif
-                                        <button type="submit" class="btn btn-light">Cari</button>
-                                    </div>
-                                </div>
-                            </div>
-                        </form> --}}
-
                         <form action="{{ route('admin.attendance.handlePeriode') }}" method="POST" class="my-3"
                             id="periodeForm">
                             @csrf
@@ -172,9 +152,21 @@
                                         <i class="tf-icons bx bx-trash text-white"></i> Hapus
                                     </button>
                                 </div>
+                                {{-- BARU --}}
+                                {{-- <div class="col-md-4">
+                                    <label for="search" class="form-label form-label-sm">Cari</label>
+                                    <div class="input-group input-group-sm">
+                                        <input type="text" name="search" id="search" class="form-control"
+                                            placeholder="Ketik nama, tgl, dll..."
+                                            value="{{ old('search', request('search')) }}">
+                                        <button type="submit" name="action" value="filter" class="btn btn-primary btn-sm">
+                                            <i class="bx bx-search"></i> Cari
+                                        </button>
+                                    </div>
+                                </div> --}}
+                                {{-- BARU --}}
                             </div>
                         </form>
-                        {{-- Tabel Riwayat --}}
                         <div class="table-responsive mt-5">
                             <table id="datatable" class="table table-bordered table-hover align-middle table-sm"
                                 style="font-size: 80%">
@@ -253,8 +245,6 @@
                                             <td>{{ $attendance->user->name ?? '-' }}</td>
                                             <td>{{ $officeName }}</td>
                                             <td>{{ $date }}</td>
-
-                                            {{-- Detail Masuk --}}
                                             <td>
                                                 <div class="presence-item">
                                                     <div class="presence-photo">
@@ -301,9 +291,6 @@
                                                     </div>
                                                 </div>
                                             </td>
-
-
-                                            {{-- Detail Keluar --}}
                                             <td>
                                                 <div class="presence-item">
                                                     <div class="presence-photo">
@@ -350,8 +337,6 @@
                                                     </div>
                                                 </div>
                                             </td>
-
-                                            {{-- Aksi --}}
                                             <td class="text-center">
                                                 <div class="btn-group">
                                                     <form
@@ -369,38 +354,16 @@
                                         </tr>
                                     @empty
                                         <tr>
-                                            <td colspan="9" class="text-center">Data absensi tidak ditemukan.</td>
+                                            <td colspan="7" class="text-center">Data presensi tidak ditemukan.</td>
                                         </tr>
                                     @endforelse
                                 </tbody>
                             </table>
                         </div>
                     </div>
-
                 </div>
             </div>
         </div>
-
-        {{-- Pagination --}}
-        {{-- <div class="my-4 px-3">
-            <nav aria-label="...">
-                <ul class="pagination">
-                    <li class="page-item {{ $attendances->onFirstPage() ? 'disabled' : '' }}">
-                        <a class="page-link" href="{{ $attendances->previousPageUrl() ?? '#' }}">Previous</a>
-                    </li>
-                    @for ($i = 1; $i <= $attendances->lastPage(); $i++)
-                        <li class="page-item {{ $i == $attendances->currentPage() ? 'active' : '' }}">
-                            <a class="page-link" href="{{ $attendances->url($i) }}">{{ $i }}</a>
-                        </li>
-                    @endfor
-                    <li class="page-item {{ $attendances->hasMorePages() ? '' : 'disabled' }}">
-                        <a class="page-link" href="{{ $attendances->nextPageUrl() ?? '#' }}">Next</a>
-                    </li>
-                </ul>
-            </nav>
-        </div> --}}
-
-        {{-- Modal Peta OSM --}}
         <div class="modal fade" id="mapModal" tabindex="-1" aria-labelledby="mapModalLabel" aria-hidden="true">
             <div class="modal-dialog modal-lg modal-dialog-centered">
                 <div class="modal-content">
@@ -414,7 +377,6 @@
                 </div>
             </div>
         </div>
-        {{-- Modal Foto --}}
         <div class="modal fade" id="photoModal" tabindex="-1" aria-labelledby="photoModalLabel" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered modal-lg">
                 <div class="modal-content bg-transparent border-0 shadow-none">
@@ -430,12 +392,9 @@
 @endsection
 
 @section('scripts')
-    {{-- Leaflet JS --}}
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
         integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
-
     <script>
-        // Tampilkan peta pada modal, reuse instance untuk performa
         function showPhotoModal(url) {
             const modalImg = document.getElementById('photoModalImg');
             modalImg.src = url;
@@ -470,8 +429,6 @@
                         map._marker = L.marker([lat, lng]).addTo(map);
                     }
                 }
-
-                // radius geofence (opsional)
                 if (map._circle) {
                     map.removeLayer(map._circle);
                     map._circle = null;

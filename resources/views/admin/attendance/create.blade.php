@@ -50,17 +50,6 @@
                         </span>
                     @enderror
                 </div>
-                {{-- <div class="col-md-4">
-                            <label class="form-label">Kantor</label>
-                            <input type="text" name="office_name"
-                                class="form-control @error('office_name') is-invalid @enderror"
-                                value="{{ old('office_name', $editUser->office_name ?? '') }}">
-                            @error('office_name')
-                                <span class="invalid-feedback" role="alert">
-                                    <strong>{{ $message }}</strong>
-                                </span>
-                            @enderror
-                        </div> --}}
                 <div class="col-md-4">
                     <label class="form-label">Telepon</label>
                     <input type="text" name="telephone" class="form-control @error('telephone') is-invalid @enderror"

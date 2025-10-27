@@ -64,9 +64,9 @@
                         <a href="{{ route('admin.attendance') }}" class="text-decoration-none text-dark">
                             <div class="card square-card h-100 bg-label-info">
                                 <div class="card-body d-flex flex-column align-items-center justify-content-center">
-                                    <img src="{{ asset('img/icons/absensi.png') }}" alt="Riwayat Absensi"
+                                    <img src="{{ asset('img/icons/absensi.png') }}" alt="Riwayat Presensi"
                                         class="icon-img mb-3" />
-                                    <p class="mb-0 fw-bold">Riwayat Absensi</p>
+                                    <p class="mb-0 fw-bold">Riwayat Presensi</p>
                                 </div>
                             </div>
                         </a>
@@ -96,11 +96,8 @@
                     </div>
                 </div>
             </div>
-
-            <!-- KPI Cards -->
             <div class="col-12 mt-2">
                 <div class="row g-4">
-                    <!-- Statistik Kehadiran -->
                     <div class="col-md-6">
                         <div class="card h-100">
                             <div class="card-header d-flex justify-content-between">
@@ -182,8 +179,6 @@
                             </div>
                         </div>
                     </div>
-
-                    <!-- Presensi Hari Ini -->
                     <div class="col-md-6">
                         <div class="card h-100">
                             <div class="card-header d-flex justify-content-between">
@@ -228,7 +223,7 @@
                                         </div>
                                     </li>
                                 </ul>
-                                <div class="small text-muted">Clock-in hari ini (distinct user): <strong
+                                <div class="small text-muted">Clock-in hari ini (user): <strong
                                         id="txt-today-in">{{ number_format($stats->todayClockInOnly) }}</strong>,
                                     Clock-out: <strong
                                         id="txt-today-out">{{ number_format($stats->todayClockOutOnly) }}</strong>,
@@ -240,8 +235,6 @@
                     </div>
                 </div>
             </div>
-
-            <!-- Row Grafik -->
             <div class="col-12 mt-2">
                 <div class="row g-4">
                     <div class="col-lg-8">
@@ -288,23 +281,29 @@
                                         <span>Jumlah Terlambat (range)</span><strong id="stat-late-count">0</strong>
                                     </li>
                                 </ul>
-                                <small class="text-muted d-block mt-2">Patokan terlambat: 09:00</small>
+                                {{-- <div class="mt-3">
+                                    @forelse ($locations as $loc)
+                                        <small class="text-muted d-block">
+                                            Patokan {{ $loc->office_name }}:
+                                            {{ \Carbon\Carbon::parse($loc->check_in_time)->format('H:i') }}
+                                        </small>
+                                    @empty
+                                        <small class="text-muted">Belum ada lokasi terdaftar.</small>
+                                    @endforelse
+                                </div> --}}
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-
-        </div> <!-- /row -->
+        </div>
     </div>
 @endsection
-
 @section('scripts')
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
         const fmt = (n) => new Intl.NumberFormat().format(n);
         const el = (id) => document.getElementById(id);
-
         let chartTrend, chartToday, chartLocation;
 
         async function loadStats(params = {}) {
@@ -317,13 +316,9 @@
             });
             if (!res.ok) throw new Error('Gagal mengambil data statistik');
             const d = await res.json();
-
-            // KPI dasar
             el('stat-total-employees').textContent = fmt(d.totalEmployees ?? 0);
             el('stat-total-locations').textContent = fmt(d.totalLocations ?? 0);
             el('stat-total-attendances').textContent = fmt(d.totalAttendances ?? 0);
-
-            // Hari ini
             el('stat-today-both').textContent = fmt(d.todayAttendanceBoth ?? 0);
             el('stat-today-clockin').textContent = fmt(d.todayClockInOnly ?? 0);
             el('stat-today-clockout').textContent = fmt(d.todayClockOutOnly ?? 0);
@@ -331,12 +326,9 @@
             el('txt-today-in').textContent = fmt(d.todayClockInOnly ?? 0);
             el('txt-today-out').textContent = fmt(d.todayClockOutOnly ?? 0);
             el('txt-today-both').textContent = fmt(d.todayAttendanceBoth ?? 0);
-
-            // Ketepatan waktu
             el('stat-avg-clockin').textContent = d.avgClockIn ?? '–';
             el('stat-late-count').textContent = fmt(d.lateCount ?? 0);
 
-            // Chart: Trend (Line)
             if (d.series?.labels && d.series?.values) {
                 chartTrend?.destroy();
                 chartTrend = new Chart(el('chart-trend'), {
@@ -365,8 +357,6 @@
                     }
                 });
             }
-
-            // Chart: Komposisi Hari Ini (Doughnut)
             chartToday?.destroy();
             chartToday = new Chart(el('chart-today'), {
                 type: 'doughnut',
@@ -387,8 +377,6 @@
                     }
                 }
             });
-
-            // Chart: per Lokasi (Bar)
             const locLabels = (d.byLocation ?? []).map(x => x.label);
             const locValues = (d.byLocation ?? []).map(x => x.value);
             chartLocation?.destroy();
@@ -416,8 +404,6 @@
                 }
             });
         }
-
-        // Filter & refresh
         el('apply-filter')?.addEventListener('click', () => {
             loadStats({
                 from: el('from').value,
@@ -432,8 +418,6 @@
         el('btn-refresh-stats')?.addEventListener('click', refreshAll);
         el('btn-refresh-stats-dd')?.addEventListener('click', refreshAll);
         el('btn-refresh-stats-dd-2')?.addEventListener('click', refreshAll);
-
-        // Auto load awal
         loadStats();
     </script>
 @endsection

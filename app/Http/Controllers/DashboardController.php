@@ -13,7 +13,9 @@ class DashboardController extends Controller
     public function index()
     {
         $stats = $this->computeStat();
-        return view('admin.dashboard', compact('stats'));
+        $locations = Location::orderBy('office_name', 'asc')->get();
+
+        return view('admin.dashboard', compact('stats', 'locations'));
     }
     public function stats()
     {
