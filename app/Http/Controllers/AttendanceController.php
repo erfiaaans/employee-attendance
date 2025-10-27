@@ -9,24 +9,137 @@ use App\Models\User;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use Symfony\Component\HttpFoundation\StreamedResponse;
+use Yajra\DataTables\Facades\DataTables as FacadesDataTables;
 
 
 class AttendanceController extends Controller
 {
-    public function index(Request $request)
+    public function index()
     {
-        $search = $request->input('search');
-        $userFilter = $request->input('filter');
-
-        $attendances = Attendance::orderBy('created_at', 'desc')->get();
-
-        $allUsers = User::where('role', 'employee')->get();
-
-        return view('admin.attendance.index', compact('attendances', 'allUsers', 'userFilter', 'search'));
+        return view('admin.attendance.index');
     }
+
+    public function getData(Request $request)
+    {
+        // Default tanggal: awal dan akhir bulan ini
+        $startDate = $request->start_date
+            ? Carbon::parse($request->start_date)->format('Y-m-d')
+            : Carbon::now()->startOfMonth()->format('Y-m-d');
+
+        $endDate = $request->end_date
+            ? Carbon::parse($request->end_date)->format('Y-m-d')
+            : Carbon::now()->format('Y-m-d');
+
+
+        // Query MySQL: generate tanggal + join ke users & attendance
+        $query = "
+        WITH RECURSIVE date_range AS (
+            SELECT DATE(:start_date) AS tanggal
+            UNION ALL
+            SELECT DATE_ADD(tanggal, INTERVAL 1 DAY)
+            FROM date_range
+            WHERE tanggal < DATE(:end_date)
+        )
+        SELECT
+            u.user_id AS user_id,
+            u.name AS nama_karyawan,
+            d.tanggal,
+            a.location_id,
+            a.clock_in_time,
+            a.clock_out_time,
+            a.clock_in_photo_url,
+            a.clock_out_photo_url,
+            a.clock_in_latitude,
+            a.clock_in_longitude,
+            a.clock_out_latitude,
+            a.clock_out_longitude,
+            l.office_name AS lokasi_kantor,
+            l.latitude AS office_latitude,
+            l.longitude AS office_longitude,
+            l.radius AS office_radius
+        FROM date_range d
+        CROSS JOIN users u
+        LEFT JOIN attendances a
+            ON a.user_id = u.user_id
+            AND DATE(a.created_at) = d.tanggal
+        LEFT JOIN locations l
+            ON a.location_id = l.location_id
+        WHERE u.role = 'employee'
+        ORDER BY d.tanggal DESC, u.name
+    ";
+
+        // Jalankan query pakai parameter binding
+        $data = DB::select($query, [
+            'start_date' => $startDate,
+            'end_date' => $endDate,
+        ]);
+
+        // Convert ke collection biar bisa diolah oleh DataTables
+        $collection = collect($data);
+
+        return FacadesDataTables::of($collection)
+            ->addIndexColumn()
+            ->addColumn('nama', fn($row) => e($row->nama_karyawan ?? '-'))
+            ->addColumn('lokasi', fn($row) => e($row->lokasi_kantor ?? '-'))
+            ->addColumn('tanggal', fn($row) => Carbon::parse($row->tanggal)->format('Y-m-d'))
+            ->addColumn('detail_masuk', function ($row) {
+                if (!$row->clock_in_time) return '<span class="text-muted">-</span>';
+
+                $inTime = Carbon::parse($row->clock_in_time)->format('H:i');
+                $photoUrl = $row->clock_in_photo_url
+                    ? asset('storage/' . $row->clock_in_photo_url)
+                    : asset('img/icons/user.png');
+                $photo = "<img src='{$photoUrl}' width='50' height='50' class='rounded' style='cursor:pointer' onclick=\"showPhotoModal('{$photoUrl}')\">";
+
+
+                $html = "<div class='presence-item'>
+                        <div class='presence-photo'>{$photo}</div>
+                        <div class='presence-meta'>
+                            <div class='presence-line'><span class='time'>{$inTime}</span>";
+
+                if ($row->clock_in_latitude && $row->clock_in_longitude) {
+                    $empName = addslashes($row->nama_karyawan ?? 'Pegawai');
+                    $html .= "<span class='dot'>•</span>
+                          <button type='button' class='link-map'
+                            onclick=\"showMapWithRadius({$row->clock_in_latitude}, {$row->clock_in_longitude}, 'Lokasi Masuk - {$empName}', {$row->office_radius})\">Lihat Peta</button>";
+                }
+
+                $html .= "</div></div></div>";
+                return $html;
+            })
+            ->addColumn('detail_keluar', function ($row) {
+                if (!$row->clock_out_time) return '<span class="text-muted">-</span>';
+
+                $outTime = Carbon::parse($row->clock_out_time)->format('H:i');
+                $photoUrl = $row->clock_out_photo_url
+                    ? asset('storage/' . $row->clock_out_photo_url)
+                    : asset('img/icons/user.png');
+                $photo = "<img src='{$photoUrl}' width='50' height='50' class='rounded' style='cursor:pointer' onclick=\"showPhotoModal('{$photoUrl}')\">";
+
+                $html = "<div class='presence-item'>
+                        <div class='presence-photo'>{$photo}</div>
+                        <div class='presence-meta'>
+                            <div class='presence-line'><span class='time'>{$outTime}</span>";
+
+                if ($row->clock_out_latitude && $row->clock_out_longitude) {
+                    $empName = addslashes($row->nama_karyawan ?? 'Pegawai');
+                    $html .= "<span class='dot'>•</span>
+                          <button type='button' class='link-map'
+                            onclick=\"showMapWithRadius({$row->clock_out_latitude}, {$row->clock_out_longitude}, 'Lokasi Keluar - {$empName}', {$row->office_radius})\">Lihat Peta</button>";
+                }
+
+                $html .= "</div></div></div>";
+                return $html;
+            })
+            ->rawColumns(['detail_masuk', 'detail_keluar'])
+            ->make(true);
+    }
+
+
     public function handlePeriode(Request $request)
     {
         $request->validate(['start_date' => 'required|date', 'end_date' => 'required|date|after_or_equal:start_date',]);

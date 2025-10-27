@@ -89,6 +89,7 @@ Route::group(['namespace' => '', 'prefix' => 'admin',  'middleware' => ['auth', 
     Route::get('user/{id}', [UserController::class, 'index'])->name('admin.user.edit');
 
     Route::get('attendance', [AttendanceController::class, 'index'])->name('admin.attendance');
+    Route::get('/attendance/data', [AttendanceController::class, 'getData'])->name('admin.attendance.data');
     Route::delete('attendance/delete-by-periode', [AttendanceController::class, 'destroyByPeriode'])->name('admin.attendance.destroyByPeriode');
     Route::delete('attendance/{id}', [AttendanceController::class, 'destroy'])->whereUuid('id')->name('admin.attendance.destroy');
     Route::get('attendance/export-by-periode', [AttendanceController::class, 'exportByPeriode'])->name('admin.attendance.exportByPeriode');
